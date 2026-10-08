@@ -222,12 +222,36 @@ table.data tr:hover td{background:#faf5ff}
 .spinner{width:18px;height:18px;border:3px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:spin .8s linear infinite;display:inline-block}
 @keyframes spin{to{transform:rotate(360deg)}}
 
+/* ---------- 第二關：行星 / 觀察站 ---------- */
+.planet-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.planet-btn{border:2px solid var(--slate-200);border-radius:14px;padding:10px 6px;background:#fff;font-weight:700;min-height:64px;text-align:center}
+.planet-btn .pl-ico{display:block;font-size:1.6rem;line-height:1.2}
+.planet-btn:hover{border-color:var(--purple)}
+.planet-btn.on{border-color:var(--purple);background:var(--purple-l);color:var(--purple);box-shadow:0 0 0 3px rgba(124,58,237,.18)}
+.callout{background:var(--amber-l);color:#92400e;border-left:5px solid var(--amber);border-radius:12px;padding:10px 14px}
+.choice-row{display:flex;flex-wrap:wrap;gap:8px}
+.choice-btn{border:2px solid var(--slate-200);border-radius:12px;padding:8px 16px;background:#fff;font-weight:700;min-height:44px}
+.choice-btn:hover{border-color:var(--purple)}
+.choice-btn.on{border-color:var(--purple);background:var(--purple-l);color:var(--purple)}
+.choice-btn.correct{border-color:var(--green);background:var(--green-l);color:var(--green-d)}
+.choice-btn.wrong{border-color:var(--red);background:var(--red-l);color:var(--red)}
+.choice-btn:disabled{cursor:default}
+.know-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.know-card{border-radius:14px;padding:12px;border:2px solid}
+.know-t{background:#fff7ed;border-color:#fdba74}
+.know-j{background:#eff6ff;border-color:#93c5fd}
+.fill-sentence{background:var(--slate-50);border-radius:14px;padding:14px;line-height:2.6;border:1px solid var(--slate-200)}
+.inline-input{border:0;border-bottom:3px solid var(--purple);background:#fff;border-radius:6px 6px 0 0;padding:4px 8px;min-width:180px;max-width:100%;outline:none;font-weight:700;color:var(--purple)}
+.inline-select{min-width:110px}
+
 /* ---------- 響應式 ---------- */
 @media (max-width:760px){
   .grid-2,.summary-grid{grid-template-columns:1fr}
   .card-grid{grid-template-columns:1fr 1fr}
   .stats{grid-template-columns:1fr 1fr}
   .map-preview{grid-template-columns:1fr}
+  .planet-grid{grid-template-columns:repeat(3,1fr)}
+  .know-grid{grid-template-columns:1fr}
   .title-main{font-size:1.05rem}
   .card{padding:16px}
 }
@@ -347,40 +371,81 @@ table.data tr:hover td{background:#faf5ff}
     <div id="stage-2" class="quest-stage hidden">
       <div class="card">
         <div class="stage-head"><span class="stage-num">第二關</span><span class="stage-title">🪄 中文詠唱術</span></div>
-        <div class="stage-goal">任務：複製專屬中文提示詞，加上自己的照片，請 Gemini 生成帶有自己名字、而且是「完整圓形」的外星人！</div>
-        <div class="row mt-3">
-          <span class="bold">橫幅上要寫：</span>
-          <div class="seg">
-            <button id="segAccount" class="on" onclick="setNameMode('account')">我的帳號</button>
-            <button id="segName" onclick="setNameMode('name')">我的姓名</button>
-          </div>
-        </div>
+        <div class="stage-goal">任務：先設計你的外星人來自哪一顆行星、長什麼樣子，系統會產生你的專屬提示詞，再請 Gemini 畫出寫著你名字的「完整圓形」外星人！</div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">🪐 步驟一：設計你的外星人</div>
+        <label class="label mt-2">1. 你的外星人來自哪一顆行星？</label>
+        <div class="planet-grid" id="planetGrid"></div>
+        <label class="label mt-3" for="inAlienDesc">2. 描述你的外星人有什麼特徵？（至少 10 個字）</label>
+        <textarea class="textarea" id="inAlienDesc" oninput="onDesignChange()" placeholder="例如：全身是亮紫色，有三隻大眼睛和兩根會發光的觸角，喜歡在沙漠裡溜滑板"></textarea>
+        <div class="hint">可以想想：身體顏色、眼睛數量、觸角、尾巴、翅膀、特殊能力、在家鄉行星上怎麼生活……</div>
+        <button class="btn btn-purple btn-block mt-3" id="btnGenPrompt" onclick="generatePrompt()">✨ 生成我的專屬提示詞</button>
+      </div>
+
+      <div class="card hidden" id="promptCard">
+        <div class="card-title">📜 步驟二：我的專屬提示詞</div>
+        <div class="hint">橫幅會寫上「<b id="bannerPreview"></b>」，修改上面的行星或特徵，提示詞會自動更新。</div>
         <div class="prompt-box mt-2" id="promptBox"></div>
         <div class="row mt-2">
           <button class="btn btn-purple" onclick="copyPrompt()">📋 複製提示詞</button>
           <a class="btn btn-green" href="https://gemini.google.com/app" target="_blank" rel="noopener">✨ 開啟 Gemini</a>
         </div>
       </div>
+
       <div class="card">
-        <div class="card-title">🧭 詠唱步驟</div>
+        <div class="card-title">🧭 步驟三：到 Gemini 詠唱</div>
+        <div class="callout mt-2">⚠️ <b>一定要先選「建立圖像」！</b>沒選的話，Gemini 可能只會用文字回答，不會畫圖。</div>
         <ol class="steps-list mt-2">
           <li><div>點「開啟 Gemini」，用<b>學校帳號</b>登入。</div></li>
-          <li><div>在對話框按「＋」上傳<b>自己的</b>人臉照片（不能用同學的喔！）。</div></li>
+          <li><div>點對話框左邊的「<b>＋</b>」，在跳出的選單中點「<b>🖼️ 建立圖像</b>」。對話框裡出現「建立圖像」的標籤，才算選好。</div></li>
+          <li><div>再點一次「<b>＋</b>」→「<b>上傳檔案</b>」，選擇<b>自己的</b>人臉照片（不能用同學的喔！）。</div></li>
           <li><div>貼上剛剛複製的提示詞，按送出，等 AI 畫圖。</div></li>
           <li><div>檢查圖片：如果被裁切或不是圓形，再對 Gemini 說：「<b>請把整個圖案縮小，完整放進圓形裡，不要被裁切</b>」。</div></li>
           <li><div>滿意後，把圖片<b>下載</b>到電腦。</div></li>
         </ol>
       </div>
+
       <div class="card">
         <div class="card-title">⭕ 魔法圓檢查表（全部打勾才能過關）</div>
         <div class="mt-2" id="checklistBox"></div>
-        <div class="mt-3">
-          <label class="label" for="inAlienDesc">👽 介紹你的外星人：他有什麼特色？（至少 5 個字）</label>
-          <input class="input" id="inAlienDesc" placeholder="例如：戴著橘色頭盔，笑起來很可愛">
+      </div>
+
+      <div class="card">
+        <div class="card-title">🔭 步驟四：作品觀察站</div>
+
+        <label class="label mt-2">1. 生成的外星人符合你的想法嗎？</label>
+        <div class="choice-row" id="matchBox"></div>
+        <input class="input mt-1" id="inMatchReason" placeholder="哪裡符合？哪裡跟你想的不一樣？（至少 5 個字）">
+
+        <label class="label mt-3">2. 你的外星人來自「<span id="obsPlanet">？</span>」，這是哪一種行星？</label>
+        <div class="choice-row" id="ptBox"></div>
+        <div id="ptFb"></div>
+
+        <div class="hidden" id="planetKnow">
+          <div class="know-grid mt-2">
+            <div class="know-card know-t"><div class="bold">🪨 類地行星</div><div class="small">水星、金星、地球、火星</div><div class="small mt-1">體積較小、表面是堅硬的<b>岩石</b>、有山谷和隕石坑、沒有行星環、衛星很少。</div></div>
+            <div class="know-card know-j"><div class="bold">☁️ 類木行星</div><div class="small">木星、土星、天王星、海王星</div><div class="small mt-1">體積很大、主要由<b>氣體</b>組成、表面有雲帶條紋、大多有<b>行星環</b>、衛星很多。</div></div>
+          </div>
+
+          <label class="label mt-3">3. 填充題：看看你的圖片，有沒有符合這種行星的特徵？</label>
+          <div class="fill-sentence">
+            我的圖片中出現了
+            <input class="inline-input" id="inEvidence" placeholder="例如：紅色的岩石地面">
+            ，所以
+            <select class="inline-input inline-select" id="selEvidence">
+              <option value="">（選一個）</option>
+              <option value="符合">符合</option>
+              <option value="不符合">不符合</option>
+            </select>
+            <b id="fillType">？</b> 的特徵。
+          </div>
         </div>
       </div>
+
       <div class="card">
-        <div class="card-title">📺 小測驗</div>
+        <div class="card-title">❓ 小測驗</div>
         <div class="mt-2" id="quiz-2"></div>
       </div>
       <button class="btn btn-primary btn-block mt-3" id="btnStage2" onclick="completeStage(2)">✅ 魔法圓完成，前往第三關</button>
@@ -390,8 +455,17 @@ table.data tr:hover td{background:#faf5ff}
     <div id="stage-3" class="quest-stage hidden">
       <div class="card">
         <div class="stage-head"><span class="stage-num">第三關</span><span class="stage-title">🌀 實體傳送門</span></div>
-        <div class="stage-goal">任務：前往專屬列印網站，上傳你的圓形外星人圖片，準備變成實體鑰匙圈！</div>
-        <ol class="steps-list mt-3">
+        <div class="stage-goal">任務：先看影片了解徽章怎麼製作，再到專屬列印網站上傳你的圓形外星人，準備變成實體鑰匙圈！</div>
+        <div class="card-title mt-3">📺 影片：徽章是怎麼做出來的？</div>
+        <div class="mt-2" id="badgeVideoBox"></div>
+      </div>
+      <div class="card">
+        <div class="card-title">📺 影片小測驗</div>
+        <div class="mt-2" id="quiz-3"></div>
+      </div>
+      <div class="card">
+        <div class="card-title">🌀 上傳到列印網站</div>
+        <ol class="steps-list mt-2">
           <li><div>點下方「開啟列印網站」（請用<b>學校帳號</b>登入）。</div></li>
           <li><div>依照網站說明，輸入帳號並選擇剛剛下載的<b>圓形外星人圖片</b>。</div></li>
           <li><div>按下上傳，看到「上傳成功」的訊息才算完成！</div></li>
@@ -403,8 +477,8 @@ table.data tr:hover td{background:#faf5ff}
         </div>
       </div>
       <div class="card">
-        <div class="card-title">📺 小測驗</div>
-        <div class="mt-2" id="quiz-3"></div>
+        <div class="card-title">❓ 小測驗</div>
+        <div class="mt-2" id="quiz-4"></div>
       </div>
       <button class="btn btn-primary btn-block mt-3" id="btnStage3" onclick="completeStage(3)">🏆 完成任務，領取勳章！</button>
     </div>
@@ -455,12 +529,16 @@ table.data tr:hover td{background:#faf5ff}
             <input class="input" id="inYoutube" placeholder="https://www.youtube.com/watch?v=...">
           </div>
           <div>
+            <label class="label" for="inBadgeVideo">🎬 第三關徽章製作影片網址</label>
+            <input class="input" id="inBadgeVideo" placeholder="https://www.youtube.com/watch?v=...">
+          </div>
+          <div>
             <label class="label" for="inPrintUrl">🌀 第三關列印網站網址</label>
             <input class="input" id="inPrintUrl" placeholder="https://script.google.com/...">
           </div>
         </div>
         <button class="btn btn-green btn-sm mt-2" id="btnSaveSettings" onclick="saveSettings()">💾 儲存設定</button>
-        <div class="hint mt-1">💡 也可以直接在試算表「Config」工作表修改：youtubeUrl（影片）、printUrl（列印網站）、teacherPassword（教師密碼）。</div>
+        <div class="hint mt-1">💡 也可以直接在試算表「Config」工作表修改：youtubeUrl（第一關影片）、badgeVideoUrl（第三關徽章影片）、printUrl（列印網站）、teacherPassword（教師密碼）。</div>
       </div>
 
       <div class="stats mt-2" id="statsBox"></div>
@@ -511,9 +589,11 @@ table.data tr:hover td{background:#faf5ff}
    ===================================================================== */
 const DEFAULT_GAS_URL = 'https://script.google.com/macros/s/AKfycbyAdWa6QkWC8Zl2c5p0oFnjVwQrL6o8JnTWq_EfKmGaheXhgEQhWWetvmQTbjzog308/exec';
 const DEFAULT_PRINT_URL = 'https://script.google.com/a/macros/cces.ptc.edu.tw/s/AKfycbyCiOrB0C5ejdXJmNDrlO5NYBVUp6peT3kvJBaZwUjPTVUsE5jZPx4Cpw0qOGJ7K1vUZA/exec';
+const DEFAULT_BADGE_VIDEO_URL = 'https://www.youtube.com/watch?v=ayxt4wsEk8I';
 
-const APP_VERSION = 'v1.1';
+const APP_VERSION = 'v1.2';
 const CHANGELOG = [
+  { version: 'v1.2', date: '2026-10-09', desc: '第二關改版：橫幅固定寫「姓名@Gemini AI」；先選外星人的家鄉行星並描述特徵，才會生成專屬提示詞；加入 Gemini「建立圖像」操作指引；新增作品觀察站（是否符合想法、類地／類木行星判斷、行星特徵填充題）；小測驗改為「標示 @Gemini AI 代表 AI 生成」。第三關新增徽章製作影片與影片測驗（影片網址可在 Config 的 badgeVideoUrl 修改）。' },
   { version: 'v1.1', date: '2026-10-09', desc: '教師密碼與 YouTube 影片網址改為直接在試算表「Config」工作表修改（teacherPassword／youtubeUrl），改完立即生效；主控台網址設定區加上提示。' },
   { version: 'v1.0', date: '2026-10-09', desc: '初版：三關闖關（數位防護罩／中文詠唱術／實體傳送門）、ptc 帳號登入與進度紀錄、影片與列印網址由教師後台設定、提示詞自動帶入帳號或姓名、教師主控台三檢視（表格／清單／圖卡）與學員詳情。' }
 ];
@@ -530,6 +610,19 @@ const STAGES = [
   { step: 4, ico: '🏆', name: '通關' }
 ];
 
+// 行星資料：type 決定類地／類木；scene 會寫進提示詞，讓 AI 畫出該行星的特徵
+const PLANETS = [
+  { name: '水星', ico: '🌑', type: 'terrestrial', scene: '布滿隕石坑的灰色岩石地面，天空中有一顆巨大明亮的太陽' },
+  { name: '金星', ico: '🟡', type: 'terrestrial', scene: '被濃厚黃色雲層籠罩、炙熱又布滿火山的岩石大地' },
+  { name: '火星', ico: '🔴', type: 'terrestrial', scene: '紅色的沙漠、岩石峽谷和高聳的火山' },
+  { name: '木星', ico: '🟠', type: 'jovian', scene: '巨大的橘白色條紋氣體雲和旋轉的大紅斑風暴，周圍有許多衛星' },
+  { name: '土星', ico: '🪐', type: 'jovian', scene: '淡黃色的條紋氣體雲，以及一圈又寬又美麗的行星環' },
+  { name: '天王星', ico: '🔵', type: 'jovian', scene: '冰冷的淡藍綠色氣體雲，以及細細的直立行星環' },
+  { name: '海王星', ico: '🌊', type: 'jovian', scene: '深藍色、颳著超強狂風的氣體雲，以及淡淡的行星環' }
+];
+const PLANET_TYPE_LABEL = { terrestrial: '類地行星', jovian: '類木行星' };
+const MATCH_OPTIONS = ['完全符合', '部分符合', '不太符合'];
+
 const QUIZZES = {
   1: {
     q: '觀看 YouTube 影片後，關於「P 圖（影像合成）」的行為，我們應該抱持什麼樣的態度？',
@@ -543,17 +636,28 @@ const QUIZZES = {
     explain: '答對了！我們必須成為負責任的數位小公民，尊重他人的肖像權與感受喔！'
   },
   2: {
-    q: '為了讓我們設計的外星人可以完美做成實體鑰匙圈，在下指令給 AI 時，哪一件事情最重要？',
+    q: '我們在外星人圖片的橫幅上寫「姓名@Gemini AI」，最主要的原因是什麼？',
     opts: [
-      ['A', '圖片越長越好'],
-      ['B', '要求 AI 生成一個「完美的圓形」與邊框'],
-      ['C', '讓外星人變成正方形'],
-      ['D', '背景越黑越好']
+      ['A', '讓圖片看起來比較酷炫'],
+      ['B', '清楚標示這張圖是由 AI 生成的，避免別人誤以為是真實照片'],
+      ['C', '幫 Gemini 打廣告'],
+      ['D', '因為英文字比較好看']
     ],
     answer: 'B',
-    explain: '答對了！有完整的圓形跟邊框，並確保圖案沒有被裁切，列印出來後才方便製作成圓形的鑰匙圈喔！'
+    explain: '答對了！AI 生成的圖片要誠實標示出來，別人才不會被誤導。這也是負責任數位公民的表現喔！'
   },
   3: {
+    q: '看完徽章製作影片後想一想：為什麼我們的外星人圖片一定要是「完整的圓形」，圖案和文字都不能超出圓框？',
+    opts: [
+      ['A', '圓形比較省墨水'],
+      ['B', '徽章是圓形的，圖案完整在圓框內，製作時才不會被切掉或包到背面'],
+      ['C', '老師只喜歡圓形'],
+      ['D', '正方形的圖不能列印']
+    ],
+    answer: 'B',
+    explain: '答對了！徽章和鑰匙圈都是圓形的，圖案完整放在圓框裡，做出來才不會缺一角喔！'
+  },
+  4: {
     q: '完成超酷的外星人圓形圖片後，我們最後一個步驟是要去哪裡完成任務？',
     opts: [
       ['A', '存在隨身碟裡帶回家'],
@@ -569,20 +673,25 @@ const QUIZZES = {
 const CHECKLIST = [
   { id: 'c1', text: '整張圖是一個「完美的圓形」，外面有像徽章的圓形邊框' },
   { id: 'c2', text: '外星人的臉是我自己的照片（不是同學的）' },
-  { id: 'c3', text: '下方彩色橫幅有寫上我的帳號或姓名' },
+  { id: 'c3', text: '下方彩色橫幅寫著「我的姓名@Gemini AI」' },
   { id: 'c4', text: '所有圖案與文字都在圓形裡面，沒有被裁切到' }
 ];
 
 /* =====================================================================
    狀態
    ===================================================================== */
-let config = { youtubeUrl: '', printUrl: DEFAULT_PRINT_URL };
+let config = { youtubeUrl: '', badgeVideoUrl: DEFAULT_BADGE_VIDEO_URL, printUrl: DEFAULT_PRINT_URL };
 let currentStudent = null;
 let maxStepReached = 1;
 let viewingStep = 1;
-let nameMode = 'account';
 let quizState = {};
 let saving = false;
+
+// 第二關設計與觀察
+let selectedPlanet = '';
+let promptGenerated = false;
+let matchIdea = '';
+let ptState = { passed: false, answer: '', wrong: 0 };
 
 let teacherPwd = '';
 let allStudents = [];
@@ -712,8 +821,9 @@ function loadConfig() {
     if (err || !res || !res.success) { showConnectionError(); return; }
     hideConnectionError();
     config.youtubeUrl = res.data.youtubeUrl || '';
+    config.badgeVideoUrl = res.data.badgeVideoUrl || DEFAULT_BADGE_VIDEO_URL;
     config.printUrl = safeUrl(res.data.printUrl) || DEFAULT_PRINT_URL;
-    if (currentStudent) { renderVideo(); renderPrintLink(); }
+    if (currentStudent) { renderVideo(); renderBadgeVideo(); renderPrintLink(); }
   });
 }
 
@@ -774,10 +884,23 @@ function restoreFromStudent(s) {
   $('cbUploaded').checked = !!s.uploadConfirmed;
   syncCheckStyle('cbWatched');
   syncCheckStyle('cbUploaded');
-  quizState = { 1: parseQuiz(s.q1), 2: parseQuiz(s.q2), 3: parseQuiz(s.q3) };
+  quizState = { 1: parseQuiz(s.q1), 2: parseQuiz(s.q2), 3: parseQuiz(s.q3), 4: parseQuiz(s.q4) };
   const checked = (s.checklist || '').split(',').filter(Boolean);
   renderChecklist(checked);
-  [1, 2, 3].forEach(renderQuiz);
+  [1, 2, 3, 4].forEach(renderQuiz);
+
+  // 第二關設計與觀察
+  selectedPlanet = PLANETS.some(p => p.name === s.planet) ? s.planet : '';
+  promptGenerated = !!(selectedPlanet && (s.alienDesc || '').length >= 10);
+  matchIdea = s.matchIdea || '';
+  $('inMatchReason').value = s.matchReason || '';
+  ptState = parseQuiz(s.planetType);
+  const ev = parseEvidence(s.planetEvidence);
+  $('selEvidence').value = ev.verdict;
+  $('inEvidence').value = ev.text;
+  renderPlanetGrid();
+  renderPrompt();
+  renderObservation();
 }
 
 /* =====================================================================
@@ -801,30 +924,41 @@ function goToStep(n) {
   $('stage-' + n).classList.remove('hidden');
   renderStageMap();
   if (n === 1) renderVideo();
-  if (n === 2) renderPrompt();
-  if (n === 3) renderPrintLink();
-  if (n === 4) $('doneAlien').textContent = $('inAlienDesc').value || '（未填寫）';
+  if (n === 2) { renderPlanetGrid(); renderPrompt(); renderObservation(); }
+  if (n === 3) { renderBadgeVideo(); renderPrintLink(); }
+  if (n === 4) {
+    const pl = selectedPlanet ? '🪐 來自' + selectedPlanet + '（' + planetTypeLabel(selectedPlanet) + '）\n' : '';
+    $('doneAlien').textContent = pl + ($('inAlienDesc').value || '（未填寫）');
+  }
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-/* ---------- 第一關：影片 ---------- */
+/* ---------- 影片 ---------- */
 function parseYouTubeId(url) {
   const s = (url || '').trim();
   const m = s.match(/(?:youtu\.be\/|v=|\/embed\/|\/shorts\/|\/live\/)([A-Za-z0-9_-]{11})/);
   return m ? m[1] : '';
 }
 
-function renderVideo() {
-  const id = parseYouTubeId(config.youtubeUrl);
-  const box = $('videoBox');
+function renderYouTube(boxId, url, emptyMsg, title) {
+  const id = parseYouTubeId(url);
+  const box = $(boxId);
   if (!id) {
-    box.innerHTML = '<div class="video-empty">📺 老師還沒有設定影片，請依照老師的指示觀看「P 圖不惡作劇」影片。</div>';
+    box.dataset.vid = '';
+    box.innerHTML = '<div class="video-empty">' + escapeHtml(emptyMsg) + '</div>';
     return;
   }
   if (box.dataset.vid === id) return;
   box.dataset.vid = id;
-  box.innerHTML = `<div class="video-wrap"><iframe src="https://www.youtube.com/embed/${id}?rel=0" title="資訊倫理影片" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>
+  box.innerHTML = `<div class="video-wrap"><iframe src="https://www.youtube.com/embed/${id}?rel=0" title="${escapeHtml(title)}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>
     <div class="hint mt-1">影片無法播放？<a href="https://www.youtube.com/watch?v=${id}" target="_blank" rel="noopener">點這裡到 YouTube 觀看</a></div>`;
+}
+
+function renderVideo() {
+  renderYouTube('videoBox', config.youtubeUrl, '📺 老師還沒有設定影片，請依照老師的指示觀看「P 圖不惡作劇」影片。', '資訊倫理影片');
+}
+function renderBadgeVideo() {
+  renderYouTube('badgeVideoBox', config.badgeVideoUrl || DEFAULT_BADGE_VIDEO_URL, '📺 老師還沒有設定徽章影片，請依照老師的指示觀看。', '徽章製作影片');
 }
 
 /* ---------- 勾選框 ---------- */
@@ -840,41 +974,131 @@ function syncCheckStyle(id) {
   if (wrap) wrap.classList.toggle('checked', cb.checked);
 }
 
-/* ---------- 第二關：提示詞 ---------- */
-function setNameMode(mode) {
-  nameMode = mode;
-  $('segAccount').classList.toggle('on', mode === 'account');
-  $('segName').classList.toggle('on', mode === 'name');
-  renderPrompt();
+/* ---------- 第二關：設計外星人 ---------- */
+function getPlanet(name) { return PLANETS.find(p => p.name === name) || null; }
+function planetTypeLabel(name) { const p = getPlanet(name); return p ? PLANET_TYPE_LABEL[p.type] : ''; }
+
+function renderPlanetGrid() {
+  $('planetGrid').innerHTML = PLANETS.map(p =>
+    `<button class="planet-btn${p.name === selectedPlanet ? ' on' : ''}" onclick="selectPlanet('${p.name}')"><span class="pl-ico">${p.ico}</span>${escapeHtml(p.name)}</button>`
+  ).join('');
 }
 
-function bannerText() {
-  if (!currentStudent) return '[輸入你的帳號或姓名]';
-  return nameMode === 'name' ? currentStudent.name : currentStudent.account;
+function selectPlanet(name) {
+  if (name !== selectedPlanet) {
+    selectedPlanet = name;
+    ptState = { passed: false, answer: '', wrong: 0 }; // 換行星就要重新判斷類型
+  }
+  renderPlanetGrid();
+  renderPrompt();
+  renderObservation();
+}
+
+function onDesignChange() {
+  if (promptGenerated) renderPrompt();
+}
+
+function generatePrompt() {
+  if (!selectedPlanet) { showToast('請先選擇外星人的家鄉行星', 'error'); return; }
+  if ($('inAlienDesc').value.trim().length < 10) { showToast('外星人特徵至少要寫 10 個字喔', 'error'); return; }
+  promptGenerated = true;
+  renderPrompt();
+  showToast('✨ 專屬提示詞完成！', 'success');
+  $('promptCard').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function studentName() {
+  return currentStudent && currentStudent.name ? currentStudent.name : '我的姓名';
 }
 
 function buildPrompt(label) {
-  return '請使用我上傳的人臉照片，將這個人變成一個可愛、友善的 3D 卡通綠色外星人。這個人的真實臉孔要自然且完美地成為外星人的臉，並穿著專屬的宇宙太空衣與頭盔。\n'
-    + '整張圖片必須是一個「完美的圓形」，置於純白色的背景正中央。請在圓形的邊緣加上像徽章一樣的圓形外框。外星人要開心地揮手，背景是充滿橘色星球、閃亮星星與美麗星雲的宇宙。\n'
+  const p = getPlanet(selectedPlanet);
+  const features = $('inAlienDesc').value.trim().replace(/\s+/g, ' ');
+  return '請使用我上傳的人臉照片，將這個人變成一個可愛、友善的 3D 卡通外星人。這個人的真實臉孔要自然且完美地成為外星人的臉，並穿著專屬的宇宙太空衣與頭盔。\n'
+    + '這個外星人來自「' + p.name + '」，他的外型特徵是：' + features + '。\n'
+    + '整張圖片必須是一個「完美的圓形」，置於純白色的背景正中央。請在圓形的邊緣加上像徽章一樣的圓形外框。外星人要開心地揮手，圓形裡的背景是他的家鄉' + p.name + '：' + p.scene + '，並點綴閃亮的星星。\n'
     + '在圓形內部的最下方，加上一個 3D 彩色弧形橫幅（Banner），裡面用繁體中文粗體字寫上：「' + label + '@Gemini AI」。整張插圖必須是 3D 動畫 Q 版風格，而且所有的圖案與文字都要「完整包覆在圓形外框內」，絕對不能超出圓形邊界或被裁切到。';
 }
 
 function renderPrompt() {
-  const label = bannerText();
-  const text = buildPrompt('\u0000');
-  const [before, after] = text.split('\u0000');
+  const ready = promptGenerated && selectedPlanet && $('inAlienDesc').value.trim().length >= 10;
+  $('promptCard').classList.toggle('hidden', !ready);
+  if (!ready) return;
+  const label = studentName();
+  $('bannerPreview').textContent = label + '@Gemini AI';
+  const [before, after] = buildPrompt('\u0000').split('\u0000');
   $('promptBox').innerHTML = escapeHtml(before) + '<span class="hl">' + escapeHtml(label) + '</span>' + escapeHtml(after);
 }
 
 function copyPrompt() {
-  const text = buildPrompt(bannerText());
-  const ok = () => showToast('📋 已複製！到 Gemini 貼上吧', 'success');
+  if (!promptGenerated || !selectedPlanet) { showToast('請先生成專屬提示詞', 'error'); return; }
+  const text = buildPrompt(studentName());
+  const ok = () => showToast('📋 已複製！記得在 Gemini 先選「建立圖像」再貼上', 'success');
   if (navigator.clipboard && window.isSecureContext) {
     navigator.clipboard.writeText(text).then(ok).catch(() => fallbackCopy(text, ok));
   } else {
     fallbackCopy(text, ok);
   }
 }
+
+/* ---------- 第二關：作品觀察站 ---------- */
+function parseEvidence(v) {
+  const s = (v || '').toString();
+  const i = s.indexOf('｜');
+  if (i < 0) return { verdict: '', text: s };
+  return { verdict: s.slice(0, i), text: s.slice(i + 1) };
+}
+
+function setMatch(v) {
+  matchIdea = v;
+  renderObservation();
+}
+
+function renderObservation() {
+  $('matchBox').innerHTML = MATCH_OPTIONS.map(o =>
+    `<button class="choice-btn${o === matchIdea ? ' on' : ''}" onclick="setMatch('${o}')">${o === '完全符合' ? '😍 ' : o === '部分符合' ? '🙂 ' : '🤔 '}${o}</button>`
+  ).join('');
+
+  const p = getPlanet(selectedPlanet);
+  $('obsPlanet').textContent = p ? p.name : '還沒選行星';
+  if (!p) {
+    $('ptBox').innerHTML = '<div class="hint">請先在步驟一選擇外星人的家鄉行星。</div>';
+    $('ptFb').innerHTML = '';
+    $('planetKnow').classList.add('hidden');
+    return;
+  }
+  const correct = PLANET_TYPE_LABEL[p.type];
+  $('ptBox').innerHTML = ['類地行星', '類木行星'].map(t => {
+    let cls = 'choice-btn';
+    if (ptState.passed && t === correct) cls += ' correct';
+    return `<button class="${cls}" ${ptState.passed ? 'disabled' : ''} onclick="answerPlanetType('${t}',this)">${t === '類地行星' ? '🪨 ' : '☁️ '}${t}</button>`;
+  }).join('');
+  $('ptFb').innerHTML = ptState.passed
+    ? `<div class="explain ok">🎉 答對了！${escapeHtml(p.name)}是${correct}。看看下面的特徵，再對照你的圖片吧！</div>`
+    : '';
+  $('planetKnow').classList.toggle('hidden', !ptState.passed);
+  $('fillType').textContent = correct;
+}
+
+function answerPlanetType(t, btn) {
+  const p = getPlanet(selectedPlanet);
+  if (!p || ptState.passed) return;
+  if (t === PLANET_TYPE_LABEL[p.type]) {
+    ptState.passed = true;
+    ptState.answer = t;
+    renderObservation();
+    showToast('🎉 答對了！', 'success');
+  } else {
+    ptState.wrong += 1;
+    btn.classList.add('wrong');
+    btn.disabled = true;
+    btn.classList.remove('shake');
+    void btn.offsetWidth;
+    btn.classList.add('shake');
+    $('ptFb').innerHTML = '<div class="explain no">🤔 再想想看！它的表面是堅硬的岩石，還是大部分都是氣體呢？</div>';
+  }
+}
+
 function fallbackCopy(text, ok) {
   const ta = document.createElement('textarea');
   ta.value = text;
@@ -949,6 +1173,8 @@ function quizValue(n) {
    學生：過關與儲存
    ===================================================================== */
 function collectCurrentFields() {
+  const verdict = $('selEvidence').value;
+  const evText = $('inEvidence').value.trim();
   return {
     reflection: $('inReflection').value.trim(),
     alienDesc: $('inAlienDesc').value.trim(),
@@ -956,7 +1182,13 @@ function collectCurrentFields() {
     uploadConfirmed: $('cbUploaded').checked,
     q1: quizValue(1),
     q2: quizValue(2),
-    q3: quizValue(3)
+    q3: quizValue(3),
+    q4: quizValue(4),
+    planet: selectedPlanet,
+    matchIdea: matchIdea,
+    matchReason: $('inMatchReason').value.trim(),
+    planetType: ptState.passed ? ptState.answer + '|' + ptState.wrong : '',
+    planetEvidence: (verdict || evText) ? verdict + '｜' + evText : ''
   };
 }
 
@@ -967,13 +1199,21 @@ function validateStage(n) {
     if (!quizState[1] || !quizState[1].passed) return '請先答對影片小測驗';
   }
   if (n === 2) {
+    if (!selectedPlanet) return '請先選擇外星人的家鄉行星';
+    if ($('inAlienDesc').value.trim().length < 10) return '外星人特徵至少要寫 10 個字喔';
+    if (!promptGenerated) return '請先按「生成我的專屬提示詞」';
     if (getCheckedIds().length < CHECKLIST.length) return '魔法圓檢查表要全部打勾才能過關';
-    if ($('inAlienDesc').value.trim().length < 5) return '請用至少 5 個字介紹你的外星人';
+    if (!matchIdea) return '請回答：生成的外星人符合你的想法嗎？';
+    if ($('inMatchReason').value.trim().length < 5) return '請用至少 5 個字說明哪裡符合或不符合';
+    if (!ptState.passed) return '請先答對：你的行星是類地行星還是類木行星？';
+    if ($('inEvidence').value.trim().length < 2) return '請完成填充題：圖片中出現了什麼？';
+    if (!$('selEvidence').value) return '請在填充題選擇「符合」或「不符合」';
     if (!quizState[2] || !quizState[2].passed) return '請先答對小測驗';
   }
   if (n === 3) {
+    if (!quizState[3] || !quizState[3].passed) return '請先答對徽章影片小測驗';
     if (!$('cbUploaded').checked) return '請確認已在列印網站上傳成功';
-    if (!quizState[3] || !quizState[3].passed) return '請先答對小測驗';
+    if (!quizState[4] || !quizState[4].passed) return '請先答對小測驗';
   }
   return '';
 }
@@ -1035,16 +1275,30 @@ function fmtChecklist(v) {
 function fmtUpload(v) { return v ? '✅ 已上傳' : '—'; }
 
 // 欄位統一定義：日後加欄位只改這裡，三種檢視一起生效
+function fmtEvidence(v) {
+  const e = parseEvidence(v);
+  if (!e.verdict && !e.text) return '—';
+  return '圖片中出現了「' + (e.text || '？') + '」，所以' + (e.verdict || '？') + '行星特徵';
+}
+function fmtMatch(v) { return v || '—'; }
+
+// 欄位統一定義：日後加欄位只改這裡，三種檢視一起生效（card:true → 圖卡「全部」模式顯示）
 const ANSWER_FIELDS = [
-  { key: 'reflection', label: '資訊倫理心得', icon: '💭', mono: false },
-  { key: 'alienDesc', label: '我的外星人特色', icon: '👽', mono: false },
+  { key: 'planet', label: '家鄉行星', icon: '🪐', card: true },
+  { key: 'alienDesc', label: '外星人特徵', icon: '👽', card: true },
+  { key: 'matchIdea', label: '符合想法嗎', icon: '🎯', fmt: fmtMatch, card: true },
+  { key: 'matchReason', label: '符合／不符合的地方', icon: '💬', card: true },
+  { key: 'planetType', label: '類地／類木判斷', icon: '🔭', fmt: fmtQuiz },
+  { key: 'planetEvidence', label: '行星特徵填充題', icon: '✏️', fmt: fmtEvidence, card: true },
+  { key: 'reflection', label: '資訊倫理心得', icon: '💭' },
   { key: 'q1', label: '測驗1｜P 圖態度', icon: '🛡️', fmt: fmtQuiz },
-  { key: 'q2', label: '測驗2｜圓形重點', icon: '⭕', fmt: fmtQuiz },
-  { key: 'q3', label: '測驗3｜上傳去處', icon: '🌀', fmt: fmtQuiz },
+  { key: 'q2', label: '測驗2｜@Gemini AI 標示', icon: '🏷️', fmt: fmtQuiz },
+  { key: 'q3', label: '測驗3｜徽章影片', icon: '🎬', fmt: fmtQuiz },
+  { key: 'q4', label: '測驗4｜上傳去處', icon: '🌀', fmt: fmtQuiz },
   { key: 'checklist', label: '魔法圓檢查表', icon: '☑️', fmt: fmtChecklist },
   { key: 'uploadConfirmed', label: '列印網站上傳', icon: '📤', fmt: fmtUpload }
 ];
-const TEXT_FIELDS = ANSWER_FIELDS.filter(f => !f.fmt);
+const TEXT_FIELDS = ANSWER_FIELDS.filter(f => f.card);
 
 function fieldText(s, f) {
   const v = s[f.key];
@@ -1098,21 +1352,25 @@ function toggleSettings() {
 }
 function fillSettings() {
   $('inYoutube').value = config.youtubeUrl || '';
+  $('inBadgeVideo').value = config.badgeVideoUrl || DEFAULT_BADGE_VIDEO_URL;
   $('inPrintUrl').value = config.printUrl || DEFAULT_PRINT_URL;
 }
 
 async function saveSettings() {
   const youtubeUrl = $('inYoutube').value.trim();
+  const badgeVideoUrl = $('inBadgeVideo').value.trim();
   const printUrl = $('inPrintUrl').value.trim();
+  if (badgeVideoUrl && !parseYouTubeId(badgeVideoUrl)) { showToast('看不懂徽章影片的 YouTube 網址，請確認', 'error'); return; }
   if (!printUrl) { showToast('請先輸入列印網站網址', 'error'); return; }
   if (!safeUrl(printUrl)) { showToast('列印網站網址要以 https:// 開頭', 'error'); return; }
   if (youtubeUrl && !parseYouTubeId(youtubeUrl)) { showToast('看不懂這個 YouTube 網址，請確認', 'error'); return; }
   const btn = $('btnSaveSettings');
   setBusy(btn, true, '儲存中…');
   try {
-    const res = await callGAS_POST({ action: 'saveConfig', password: teacherPwd, youtubeUrl, printUrl });
+    const res = await callGAS_POST({ action: 'saveConfig', password: teacherPwd, youtubeUrl, badgeVideoUrl, printUrl });
     if (!res.success) throw new Error(res.message || '儲存失敗');
     config.youtubeUrl = res.data.youtubeUrl;
+    config.badgeVideoUrl = res.data.badgeVideoUrl || DEFAULT_BADGE_VIDEO_URL;
     config.printUrl = res.data.printUrl;
     showToast('💾 設定已儲存，學生重新整理後生效', 'success');
   } catch (err) {
@@ -1223,14 +1481,16 @@ function renderTable(list) {
       <td class="nowrap">${escapeHtml(s.className || '—')}</td>
       <td class="nowrap">${s.isCompleted ? '<span class="tag tag-green">🏆 已完賽</span>' : '<span class="tag tag-amber">' + escapeHtml(stepLabel(s)) + '</span>'}</td>
       <td class="nowrap bold">${s.xp || 0}</td>
-      <td class="nowrap">${escapeHtml(fmtQuiz(s.q1))}<br>${escapeHtml(fmtQuiz(s.q2))}<br>${escapeHtml(fmtQuiz(s.q3))}</td>
+      <td class="nowrap">${escapeHtml(s.planet || '—')}${s.planet ? '<br><span class="small muted">' + escapeHtml(fmtQuiz(s.planetType)) + '</span>' : ''}</td>
+      <td class="nowrap">${escapeHtml(s.matchIdea || '—')}</td>
+      <td class="nowrap small">${[1, 2, 3, 4].map(i => escapeHtml(fmtQuiz(s['q' + i]))).join('<br>')}</td>
       <td class="nowrap">${escapeHtml(fmtChecklist(s.checklist))}</td>
       <td class="nowrap">${escapeHtml(fmtUpload(s.uploadConfirmed))}</td>
       <td class="nowrap small muted">${escapeHtml(s.updatedAt || '')}</td>
       <td><button class="btn btn-ghost btn-sm" onclick="openDetail('${escapeHtml(s.account)}')">詳情</button></td>
     </tr>`).join('');
   return `<div class="table-wrap"><table class="data">
-    <thead><tr><th>帳號</th><th>姓名</th><th>班級</th><th>進度</th><th>XP</th><th>測驗 1/2/3</th><th>圓形檢核</th><th>上傳</th><th>更新時間</th><th></th></tr></thead>
+    <thead><tr><th>帳號</th><th>姓名</th><th>班級</th><th>進度</th><th>XP</th><th>行星／類型</th><th>符合想法</th><th>測驗 1~4</th><th>圓形檢核</th><th>上傳</th><th>更新時間</th><th></th></tr></thead>
     <tbody>${rows}</tbody></table></div>`;
 }
 
