@@ -1,0 +1,1302 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>車城國小｜星際鑰匙圈任務：資訊倫理與 AI 魔法圓</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+/* =====================================================================
+   ⚠️ 維護提醒：本頁不使用 Tailwind CDN，所有樣式皆為自建。
+   日後新增任何 class，必須回到這個 <style> 區塊補上規則，
+   否則樣式會「靜默失效」（不報錯，只是少了顏色或間距）。
+   順序：色票 → Reset → 版面 → 元件 → 教師主控台 → 響應式 → .hidden（最後）
+   ===================================================================== */
+:root{
+  --space:#0b1033; --space2:#1e1b4b; --nebula:#4c1d95;
+  --orange:#f97316; --orange-d:#c2410c; --orange-l:#ffedd5;
+  --green:#22c55e; --green-d:#15803d; --green-l:#dcfce7;
+  --purple:#7c3aed; --purple-l:#ede9fe;
+  --red:#dc2626; --red-l:#fee2e2;
+  --amber:#d97706; --amber-l:#fef3c7;
+  --blue:#2563eb; --blue-l:#dbeafe;
+  --slate-50:#f8fafc; --slate-100:#f1f5f9; --slate-200:#e2e8f0; --slate-300:#cbd5e1;
+  --slate-500:#64748b; --slate-600:#475569; --slate-700:#334155; --slate-900:#0f172a;
+  --radius:18px;
+}
+*,::before,::after{box-sizing:border-box;border:0 solid var(--slate-200);margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{font-family:'Noto Sans TC',system-ui,-apple-system,sans-serif;color:var(--slate-900);line-height:1.65;min-height:100vh;display:flex;flex-direction:column;
+  background:radial-gradient(circle at 10% 0%,#e0e7ff 0,transparent 40%),radial-gradient(circle at 90% 10%,#ffedd5 0,transparent 35%),#f5f3ff}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer;background:none}
+img,iframe{display:block;max-width:100%}
+a{color:var(--blue)}
+
+/* ---------- 版面 ---------- */
+.container{width:100%;max-width:980px;margin:0 auto;padding:0 16px}
+main{flex:1;padding:20px 0 40px}
+.row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.spacer{flex:1}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.mt-1{margin-top:6px}.mt-2{margin-top:12px}.mt-3{margin-top:18px}.mt-4{margin-top:26px}
+.muted{color:var(--slate-500)}
+.small{font-size:.88rem}
+.center{text-align:center}
+.bold{font-weight:700}
+
+/* ---------- Header ---------- */
+.site-header{background:linear-gradient(120deg,var(--space) 0%,var(--space2) 55%,var(--nebula) 100%);color:#fff;position:relative;overflow:hidden}
+.site-header::after{content:"✦  ·  ✧   ·  ✦    ·   ✧  ·    ✦";position:absolute;right:12px;top:6px;letter-spacing:6px;opacity:.35;font-size:.8rem;pointer-events:none}
+.header-inner{display:flex;align-items:center;gap:12px;padding:14px 16px;flex-wrap:wrap}
+.logo{font-size:2rem;line-height:1}
+.title-main{font-weight:900;font-size:1.25rem;letter-spacing:.5px}
+.title-sub{font-size:.85rem;opacity:.8}
+.version-badge{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.35);color:#fff;border-radius:999px;padding:2px 10px;font-size:.78rem;font-weight:700}
+.version-badge:hover{background:rgba(255,255,255,.3)}
+.header-btn{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.3);color:#fff;border-radius:10px;padding:8px 12px;font-size:.9rem;font-weight:700;min-height:40px}
+.header-btn:hover{background:rgba(255,255,255,.25)}
+
+/* ---------- 橫幅 ---------- */
+.banner-env{background:var(--green-l);color:var(--green-d);font-size:.85rem;padding:6px 16px;text-align:center;font-weight:500}
+.banner-env.warn{background:var(--amber-l);color:var(--amber)}
+.banner-error{position:sticky;top:0;z-index:40;background:var(--red-l);color:var(--red);border-bottom:2px solid var(--red);padding:10px 16px;text-align:center;font-weight:700}
+
+/* ---------- 卡片 / 表單 / 按鈕 ---------- */
+.card{background:#fff;border-radius:var(--radius);box-shadow:0 8px 24px rgba(30,27,75,.08);border:1px solid #ede9fe;padding:22px}
+.card + .card{margin-top:16px}
+.card-title{font-size:1.15rem;font-weight:900;display:flex;align-items:center;gap:8px}
+.label{display:block;font-weight:700;font-size:.92rem;margin-bottom:6px;color:var(--slate-700)}
+.input,.textarea,.select{width:100%;border:2px solid var(--slate-200);border-radius:12px;padding:10px 12px;background:#fff;min-height:46px;outline:none;transition:border-color .15s}
+.input:focus,.textarea:focus,.select:focus{border-color:var(--purple)}
+.textarea{min-height:96px;resize:vertical}
+.hint{font-size:.82rem;color:var(--slate-500);margin-top:4px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;border-radius:12px;padding:10px 18px;font-weight:700;min-height:46px;transition:transform .1s,filter .15s,background .15s;text-decoration:none;border:2px solid transparent}
+.btn:active{transform:scale(.97)}
+.btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
+.btn-primary{background:var(--orange);color:#fff}
+.btn-primary:hover{filter:brightness(1.07)}
+.btn-green{background:var(--green-d);color:#fff}
+.btn-green:hover{filter:brightness(1.1)}
+.btn-purple{background:var(--purple);color:#fff}
+.btn-purple:hover{filter:brightness(1.1)}
+.btn-ghost{background:#fff;border-color:var(--slate-200);color:var(--slate-700)}
+.btn-ghost:hover{background:var(--slate-50)}
+.btn-ghost.active{border-color:var(--purple);background:var(--purple-l);color:var(--purple)}
+.btn-sm{min-height:36px;padding:6px 12px;font-size:.88rem;border-radius:10px}
+.btn-block{width:100%}
+
+/* ---------- 登入 ---------- */
+.hero{text-align:center;padding:10px 0 18px}
+.hero-emoji{font-size:3.4rem;line-height:1.1}
+.hero-title{font-size:1.6rem;font-weight:900;margin-top:6px}
+.hero-goal{max-width:640px;margin:8px auto 0;color:var(--slate-600)}
+.map-preview{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:18px}
+.map-stop{background:#fff;border:2px dashed var(--slate-300);border-radius:14px;padding:12px;text-align:center}
+.map-stop .num{font-size:.78rem;font-weight:700;color:var(--purple)}
+.map-stop .ico{font-size:1.8rem}
+.map-stop .name{font-weight:900}
+
+/* ---------- 學員列 / 關卡地圖 ---------- */
+.student-bar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;background:#fff;border-radius:var(--radius);padding:12px 16px;border:1px solid #ede9fe;box-shadow:0 4px 14px rgba(30,27,75,.06)}
+.avatar{width:44px;height:44px;border-radius:50%;background:var(--green-l);display:flex;align-items:center;justify-content:center;font-size:1.5rem;border:3px solid var(--green)}
+.xp-chip{background:var(--amber-l);color:var(--amber);font-weight:900;border-radius:999px;padding:4px 12px}
+.stage-map{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:14px 0}
+.pill{border-radius:14px;padding:10px 6px;text-align:center;font-weight:700;font-size:.88rem;border:2px solid var(--slate-200);background:#fff;color:var(--slate-500);min-height:44px}
+.pill .p-ico{display:block;font-size:1.3rem}
+.pill.done{border-color:var(--green);background:var(--green-l);color:var(--green-d)}
+.pill.active{border-color:var(--orange);background:var(--orange-l);color:var(--orange-d);box-shadow:0 0 0 3px rgba(249,115,22,.2)}
+.pill.locked{opacity:.55;cursor:not-allowed}
+
+.stage-head{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.stage-num{background:var(--space2);color:#fff;border-radius:12px;padding:4px 10px;font-weight:900;font-size:.85rem}
+.stage-title{font-size:1.35rem;font-weight:900}
+.stage-goal{background:var(--purple-l);color:var(--space2);border-radius:12px;padding:10px 14px;font-weight:500}
+
+.video-wrap{position:relative;width:100%;padding-top:56.25%;border-radius:14px;overflow:hidden;background:#000}
+.video-wrap iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.video-empty{border:2px dashed var(--slate-300);border-radius:14px;padding:28px;text-align:center;color:var(--slate-500)}
+
+.rule-list{list-style:none;display:grid;gap:8px}
+.rule-list li{background:var(--slate-50);border-radius:12px;padding:10px 12px;border-left:5px solid var(--purple)}
+
+.check-item{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border-radius:12px;border:2px solid var(--slate-200);cursor:pointer;background:#fff}
+.check-item + .check-item{margin-top:8px}
+.check-item input{width:22px;height:22px;margin-top:2px;accent-color:var(--green-d);flex-shrink:0}
+.check-item.checked{border-color:var(--green);background:var(--green-l)}
+
+.seg{display:inline-flex;border:2px solid var(--slate-200);border-radius:12px;overflow:hidden}
+.seg button{padding:8px 14px;font-weight:700;color:var(--slate-600);min-height:40px}
+.seg button.on{background:var(--purple);color:#fff}
+
+.prompt-box{background:var(--space);color:#e0e7ff;border-radius:14px;padding:16px;white-space:pre-wrap;word-break:break-word;font-size:.95rem;line-height:1.8;max-height:360px;overflow:auto}
+.prompt-box .hl{background:var(--orange);color:#fff;border-radius:6px;padding:0 4px;font-weight:700}
+
+.steps-list{counter-reset:s;list-style:none;display:grid;gap:8px}
+.steps-list li{counter-increment:s;display:flex;gap:10px;align-items:flex-start}
+.steps-list li::before{content:counter(s);background:var(--orange);color:#fff;border-radius:50%;width:26px;height:26px;display:flex;align-items:center;justify-content:center;font-weight:900;flex-shrink:0;font-size:.85rem}
+
+/* ---------- 測驗 ---------- */
+.quiz{border:2px solid var(--purple-l);border-radius:16px;padding:16px;background:#fdfcff}
+.quiz-q{font-weight:900;margin-bottom:10px}
+.quiz-opts{display:grid;gap:8px}
+.quiz-opt{text-align:left;border:2px solid var(--slate-200);border-radius:12px;padding:10px 14px;background:#fff;min-height:46px;font-weight:500}
+.quiz-opt:hover{border-color:var(--purple)}
+.quiz-opt.correct{border-color:var(--green);background:var(--green-l);color:var(--green-d);font-weight:700}
+.quiz-opt.wrong{border-color:var(--red);background:var(--red-l);color:var(--red)}
+.quiz-opt:disabled{cursor:default}
+.explain{margin-top:10px;border-radius:12px;padding:10px 14px;font-weight:500}
+.explain.ok{background:var(--green-l);color:var(--green-d)}
+.explain.no{background:var(--red-l);color:var(--red)}
+.shake{animation:shake .35s}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+
+/* ---------- 通關 ---------- */
+.done-wrap{text-align:center;padding:10px 0}
+.medal{width:180px;height:180px;margin:0 auto;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  background:radial-gradient(circle at 35% 30%,#fde68a,#f59e0b 60%,#b45309);border:8px solid #fff;box-shadow:0 0 0 6px var(--orange),0 12px 30px rgba(180,83,9,.35);color:#fff;animation:pop .6s ease-out}
+.medal .m-ico{font-size:3.4rem;line-height:1}
+.medal .m-txt{font-weight:900;font-size:.85rem;margin-top:4px;text-shadow:0 1px 2px rgba(0,0,0,.3)}
+@keyframes pop{0%{transform:scale(.3) rotate(-20deg);opacity:0}70%{transform:scale(1.08) rotate(4deg)}100%{transform:scale(1) rotate(0);opacity:1}}
+.done-title{font-size:1.6rem;font-weight:900;margin-top:18px}
+.xp-big{font-size:2.2rem;font-weight:900;color:var(--orange)}
+
+/* ---------- Toast / Modal ---------- */
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:70;background:var(--slate-900);color:#fff;padding:12px 20px;border-radius:12px;font-weight:700;box-shadow:0 10px 30px rgba(0,0,0,.25);max-width:92vw;text-align:center}
+.toast.error{background:var(--red)}
+.toast.success{background:var(--green-d)}
+.modal-backdrop{position:fixed;inset:0;z-index:60;background:rgba(15,23,42,.55);display:flex;align-items:center;justify-content:center;padding:16px}
+.modal{background:#fff;border-radius:var(--radius);width:100%;max-width:640px;max-height:88vh;overflow:auto;padding:22px;box-shadow:0 20px 50px rgba(0,0,0,.3)}
+.modal-head{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.modal-close{font-size:1.4rem;width:40px;height:40px;border-radius:10px;color:var(--slate-500)}
+.modal-close:hover{background:var(--slate-100)}
+.log-item{border-left:4px solid var(--purple);padding:6px 12px;margin-bottom:10px}
+.tag{display:inline-block;border-radius:999px;padding:1px 9px;font-size:.75rem;font-weight:700}
+.tag-new{background:var(--orange);color:#fff}
+.tag-green{background:var(--green-l);color:var(--green-d)}
+.tag-amber{background:var(--amber-l);color:var(--amber)}
+.tag-slate{background:var(--slate-100);color:var(--slate-600)}
+.detail-block{background:var(--slate-50);border-radius:12px;padding:10px 12px;margin-top:8px}
+.detail-label{font-weight:700;font-size:.85rem;color:var(--slate-600)}
+.detail-val{white-space:pre-wrap;word-break:break-word}
+
+/* ---------- 教師主控台 ---------- */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.stat{border-radius:14px;padding:12px;border:2px solid}
+.stat .s-num{font-size:1.6rem;font-weight:900;line-height:1.2}
+.stat .s-lbl{font-size:.82rem;font-weight:700}
+.st-purple{background:var(--purple-l);border-color:#c4b5fd;color:var(--purple)}
+.st-green{background:var(--green-l);border-color:#86efac;color:var(--green-d)}
+.st-orange{background:var(--orange-l);border-color:#fdba74;color:var(--orange-d)}
+.st-amber{background:var(--amber-l);border-color:#fcd34d;color:var(--amber)}
+.toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.toolbar .select{width:auto;min-height:38px;padding:6px 10px}
+.table-wrap{overflow-x:auto;border-radius:14px;border:1px solid var(--slate-200)}
+table.data{width:100%;border-collapse:collapse;font-size:.9rem;background:#fff}
+table.data th{background:var(--space2);color:#fff;text-align:left;padding:10px;white-space:nowrap;font-weight:700}
+table.data td{padding:9px 10px;border-top:1px solid var(--slate-100);vertical-align:top}
+table.data tr:hover td{background:#faf5ff}
+.nowrap{white-space:nowrap}
+.list-item{background:#fff;border:1px solid var(--slate-200);border-radius:14px;padding:14px 16px}
+.list-item + .list-item{margin-top:10px}
+.progress{height:10px;background:var(--slate-100);border-radius:999px;overflow:hidden;flex:1;min-width:120px}
+.progress-bar{height:100%;background:linear-gradient(90deg,var(--orange),var(--green));border-radius:999px}
+.summary-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.card-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.s-card{background:#fff;border:2px solid var(--purple-l);border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:8px;cursor:pointer;transition:transform .12s,box-shadow .12s}
+.s-card:hover{transform:translateY(-2px);box-shadow:0 10px 22px rgba(124,58,237,.15)}
+.s-card-name{font-weight:900;font-size:1.05rem}
+.clamp-2{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.clamp-4{display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
+.mono{font-family:ui-monospace,Consolas,monospace;font-size:.85rem}
+.big-text{font-size:1.05rem}
+.empty-box{padding:30px;text-align:center;color:var(--slate-500);border:2px dashed var(--slate-300);border-radius:14px}
+.settings-box{background:var(--slate-50);border-radius:14px;padding:14px;border:1px solid var(--slate-200)}
+
+/* ---------- 頁尾 ---------- */
+.site-footer{background:var(--space);color:#c7d2fe;text-align:center;padding:16px;font-size:.85rem}
+
+/* ---------- Loading ---------- */
+.spinner{width:18px;height:18px;border:3px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:spin .8s linear infinite;display:inline-block}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ---------- 響應式 ---------- */
+@media (max-width:760px){
+  .grid-2,.summary-grid{grid-template-columns:1fr}
+  .card-grid{grid-template-columns:1fr 1fr}
+  .stats{grid-template-columns:1fr 1fr}
+  .map-preview{grid-template-columns:1fr}
+  .title-main{font-size:1.05rem}
+  .card{padding:16px}
+}
+@media (max-width:480px){
+  .card-grid{grid-template-columns:1fr}
+  .stage-map{grid-template-columns:repeat(2,1fr)}
+}
+@media print{.site-header,.site-footer,.banner-env{display:none}}
+
+/* ⚠️ .hidden 必須放在所有 display 規則之後，
+   否則 "modal-backdrop hidden" 這類組合會蓋不掉 display:flex。 */
+.hidden{display:none}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="container header-inner">
+    <div class="logo">🧅</div>
+    <div>
+      <div class="title-main">星際鑰匙圈任務</div>
+      <div class="title-sub">資訊倫理與 AI 魔法圓｜車城國小資訊課</div>
+    </div>
+    <button class="version-badge" id="versionBadge" onclick="openModal('changelogModal')">v1.0</button>
+    <div class="spacer"></div>
+    <button class="header-btn" id="btnStudentHome" onclick="goStudentHome()">🚀 學生闖關</button>
+    <button class="header-btn" id="btnTeacher" onclick="openTeacher()">👩‍🏫 教師主控台</button>
+  </div>
+</header>
+<div class="banner-env" id="envBanner"></div>
+<div class="banner-error hidden" id="errorBanner"></div>
+
+<main>
+<div class="container">
+
+  <!-- ==================== 登入 ==================== -->
+  <section id="view-login">
+    <div class="hero">
+      <div class="hero-emoji">👽🔑</div>
+      <div class="hero-title">歡迎來到星際鑰匙圈製作基地！</div>
+      <p class="hero-goal">學習負責任的數位公民態度（不惡意 P 圖），用全中文提示詞請 Gemini AI 畫出完美的圓形外星人，最後上傳作品，變成屬於你的實體鑰匙圈！</p>
+    </div>
+    <div class="card" style="max-width:520px;margin:0 auto">
+      <div class="card-title">🛰️ 太空人登記處</div>
+      <div class="mt-2">
+        <label class="label" for="inAccount">我的帳號（ptc 開頭）</label>
+        <input class="input" id="inAccount" placeholder="例如：ptc12345678" autocomplete="username" autocapitalize="off">
+        <div class="hint">請輸入學校發的 ptc 帳號，ptc 三個字一定要打喔！</div>
+      </div>
+      <div class="grid-2 mt-2">
+        <div>
+          <label class="label" for="inName">姓名</label>
+          <input class="input" id="inName" placeholder="例如：王小明">
+        </div>
+        <div>
+          <label class="label" for="inClass">班級（選填）</label>
+          <input class="input" id="inClass" placeholder="例如：501">
+        </div>
+      </div>
+      <button class="btn btn-primary btn-block mt-3" id="btnLogin" onclick="doLogin()">🚀 登入，開始任務！</button>
+      <div class="hint center mt-1">已經玩過的同學輸入同一個帳號，就會接著上次的進度。</div>
+    </div>
+    <div class="map-preview">
+      <div class="map-stop"><div class="num">第一關</div><div class="ico">🛡️</div><div class="name">數位防護罩</div><div class="small muted">看影片，學會 P 圖不惡作劇</div></div>
+      <div class="map-stop"><div class="num">第二關</div><div class="ico">🪄</div><div class="name">中文詠唱術</div><div class="small muted">用提示詞畫出圓形外星人</div></div>
+      <div class="map-stop"><div class="num">第三關</div><div class="ico">🌀</div><div class="name">實體傳送門</div><div class="small muted">上傳圖片，做成鑰匙圈</div></div>
+    </div>
+  </section>
+
+  <!-- ==================== 闖關 ==================== -->
+  <section id="view-quest" class="hidden">
+    <div class="student-bar">
+      <div class="avatar">👽</div>
+      <div>
+        <div class="bold" id="sbName">-</div>
+        <div class="small muted" id="sbAccount">-</div>
+      </div>
+      <div class="spacer"></div>
+      <span class="xp-chip">⭐ <span id="sbXp">0</span> XP</span>
+      <button class="btn btn-ghost btn-sm" onclick="logout()">登出</button>
+    </div>
+
+    <div class="stage-map" id="stageMap"></div>
+
+    <!-- 第一關 -->
+    <div id="stage-1" class="quest-stage hidden">
+      <div class="card">
+        <div class="stage-head"><span class="stage-num">第一關</span><span class="stage-title">🛡️ 數位防護罩</span></div>
+        <div class="stage-goal">任務：觀看影片，學習「P 圖不惡作劇」的資訊倫理，啟動你的數位防護罩！</div>
+        <div class="mt-3" id="videoBox"></div>
+        <div class="check-item mt-2" id="ciWatched" onclick="toggleCheck(event,'cbWatched')">
+          <input type="checkbox" id="cbWatched" onchange="syncCheckStyle('cbWatched')">
+          <div><b>我已經認真看完影片了</b></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">📜 星際法規：做個好設計師</div>
+        <ul class="rule-list mt-2">
+          <li>🙅 <b>不未經同意亂 P 別人的照片</b>，更不能拿來嘲笑或惡作劇。</li>
+          <li>🖼️ 每個人的臉都受到<b>肖像權</b>保護，用別人照片前要先問：「可以嗎？」</li>
+          <li>🌐 合成圖一旦上傳網路就很難收回，<b>傷害可能一直存在</b>。</li>
+          <li>✨ 今天我們只用<b>自己的照片</b>，創作讓自己開心的作品！</li>
+        </ul>
+        <div class="mt-3">
+          <label class="label" for="inReflection">💭 想一想：如果有人把你的照片亂 P 還傳到網路上，你會有什麼感受？你會怎麼做？</label>
+          <textarea class="textarea" id="inReflection" placeholder="至少寫 10 個字喔！"></textarea>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">📺 影片小測驗</div>
+        <div class="mt-2" id="quiz-1"></div>
+      </div>
+      <button class="btn btn-primary btn-block mt-3" id="btnStage1" onclick="completeStage(1)">✅ 啟動防護罩，前往第二關</button>
+    </div>
+
+    <!-- 第二關 -->
+    <div id="stage-2" class="quest-stage hidden">
+      <div class="card">
+        <div class="stage-head"><span class="stage-num">第二關</span><span class="stage-title">🪄 中文詠唱術</span></div>
+        <div class="stage-goal">任務：複製專屬中文提示詞，加上自己的照片，請 Gemini 生成帶有自己名字、而且是「完整圓形」的外星人！</div>
+        <div class="row mt-3">
+          <span class="bold">橫幅上要寫：</span>
+          <div class="seg">
+            <button id="segAccount" class="on" onclick="setNameMode('account')">我的帳號</button>
+            <button id="segName" onclick="setNameMode('name')">我的姓名</button>
+          </div>
+        </div>
+        <div class="prompt-box mt-2" id="promptBox"></div>
+        <div class="row mt-2">
+          <button class="btn btn-purple" onclick="copyPrompt()">📋 複製提示詞</button>
+          <a class="btn btn-green" href="https://gemini.google.com/app" target="_blank" rel="noopener">✨ 開啟 Gemini</a>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">🧭 詠唱步驟</div>
+        <ol class="steps-list mt-2">
+          <li><div>點「開啟 Gemini」，用<b>學校帳號</b>登入。</div></li>
+          <li><div>在對話框按「＋」上傳<b>自己的</b>人臉照片（不能用同學的喔！）。</div></li>
+          <li><div>貼上剛剛複製的提示詞，按送出，等 AI 畫圖。</div></li>
+          <li><div>檢查圖片：如果被裁切或不是圓形，再對 Gemini 說：「<b>請把整個圖案縮小，完整放進圓形裡，不要被裁切</b>」。</div></li>
+          <li><div>滿意後，把圖片<b>下載</b>到電腦。</div></li>
+        </ol>
+      </div>
+      <div class="card">
+        <div class="card-title">⭕ 魔法圓檢查表（全部打勾才能過關）</div>
+        <div class="mt-2" id="checklistBox"></div>
+        <div class="mt-3">
+          <label class="label" for="inAlienDesc">👽 介紹你的外星人：他有什麼特色？（至少 5 個字）</label>
+          <input class="input" id="inAlienDesc" placeholder="例如：戴著橘色頭盔，笑起來很可愛">
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">📺 小測驗</div>
+        <div class="mt-2" id="quiz-2"></div>
+      </div>
+      <button class="btn btn-primary btn-block mt-3" id="btnStage2" onclick="completeStage(2)">✅ 魔法圓完成，前往第三關</button>
+    </div>
+
+    <!-- 第三關 -->
+    <div id="stage-3" class="quest-stage hidden">
+      <div class="card">
+        <div class="stage-head"><span class="stage-num">第三關</span><span class="stage-title">🌀 實體傳送門</span></div>
+        <div class="stage-goal">任務：前往專屬列印網站，上傳你的圓形外星人圖片，準備變成實體鑰匙圈！</div>
+        <ol class="steps-list mt-3">
+          <li><div>點下方「開啟列印網站」（請用<b>學校帳號</b>登入）。</div></li>
+          <li><div>依照網站說明，輸入帳號並選擇剛剛下載的<b>圓形外星人圖片</b>。</div></li>
+          <li><div>按下上傳，看到「上傳成功」的訊息才算完成！</div></li>
+        </ol>
+        <a class="btn btn-primary btn-block mt-3" id="printLink" href="#" target="_blank" rel="noopener">🌀 開啟列印網站</a>
+        <div class="check-item mt-3" id="ciUploaded" onclick="toggleCheck(event,'cbUploaded')">
+          <input type="checkbox" id="cbUploaded" onchange="syncCheckStyle('cbUploaded')">
+          <div><b>我已經在列印網站看到「上傳成功」</b></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">📺 小測驗</div>
+        <div class="mt-2" id="quiz-3"></div>
+      </div>
+      <button class="btn btn-primary btn-block mt-3" id="btnStage3" onclick="completeStage(3)">🏆 完成任務，領取勳章！</button>
+    </div>
+
+    <!-- 通關 -->
+    <div id="stage-4" class="quest-stage hidden">
+      <div class="card done-wrap">
+        <div class="medal"><div class="m-ico">👽</div><div class="m-txt">星際守護設計師</div></div>
+        <div class="done-title">🎉 恭喜通關！</div>
+        <p class="mt-1">你獲得了「<b>星際守護設計師勳章</b>」</p>
+        <div class="xp-big mt-2">+200 XP</div>
+        <p class="muted mt-2">你的外星人正在前往老師那裡，準備變成實體鑰匙圈！<br>記得：我們用 AI 發揮創意，但<b>永遠尊重別人的肖像</b>。</p>
+        <div class="detail-block mt-3" style="text-align:left">
+          <div class="detail-label">👽 我的外星人</div>
+          <div class="detail-val" id="doneAlien">-</div>
+        </div>
+        <div class="row mt-3" style="justify-content:center">
+          <button class="btn btn-ghost" onclick="goToStep(1)">🔁 回顧第一關</button>
+          <button class="btn btn-ghost" onclick="goToStep(2)">🔁 回顧第二關</button>
+          <button class="btn btn-ghost" onclick="goToStep(3)">🔁 回顧第三關</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== 教師主控台 ==================== -->
+  <section id="view-teacher" class="hidden">
+    <div id="teacherGate" class="card" style="max-width:420px;margin:20px auto">
+      <div class="card-title">🔐 教師主控台登入</div>
+      <label class="label mt-2" for="inTeacherPwd">教師密碼</label>
+      <input class="input" id="inTeacherPwd" type="password" placeholder="請輸入密碼" onkeydown="if(event.key==='Enter')teacherLogin()">
+      <button class="btn btn-purple btn-block mt-2" id="btnTeacherLogin" onclick="teacherLogin()">進入主控台</button>
+    </div>
+
+    <div id="teacherConsole" class="hidden">
+      <div class="row">
+        <div class="card-title">👩‍🏫 學員進度總覽</div>
+        <div class="spacer"></div>
+        <button class="btn btn-ghost btn-sm" onclick="toggleSettings()">⚙️ 網址設定</button>
+        <button class="btn btn-ghost btn-sm" id="btnRefresh" onclick="loadStudents()">🔄 重新整理</button>
+        <button class="btn btn-ghost btn-sm" onclick="teacherLogout()">登出</button>
+      </div>
+
+      <div class="settings-box mt-2 hidden" id="settingsBox">
+        <div class="grid-2">
+          <div>
+            <label class="label" for="inYoutube">📺 第一關 YouTube 影片網址</label>
+            <input class="input" id="inYoutube" placeholder="https://www.youtube.com/watch?v=...">
+          </div>
+          <div>
+            <label class="label" for="inPrintUrl">🌀 第三關列印網站網址</label>
+            <input class="input" id="inPrintUrl" placeholder="https://script.google.com/...">
+          </div>
+        </div>
+        <button class="btn btn-green btn-sm mt-2" id="btnSaveSettings" onclick="saveSettings()">💾 儲存設定</button>
+        <div class="hint mt-1">💡 也可以直接在試算表「Config」工作表修改：youtubeUrl（影片）、printUrl（列印網站）、teacherPassword（教師密碼）。</div>
+      </div>
+
+      <div class="stats mt-2" id="statsBox"></div>
+
+      <div class="toolbar mt-2">
+        <select class="select" id="fDate" onchange="renderStudents()"></select>
+        <select class="select" id="fClass" onchange="renderStudents()"></select>
+        <div class="spacer"></div>
+        <button class="btn btn-ghost btn-sm" id="vTable" onclick="setTeacherView('table')">📋 表格</button>
+        <button class="btn btn-ghost btn-sm" id="vList" onclick="setTeacherView('list')">📝 清單</button>
+        <button class="btn btn-ghost btn-sm" id="vCards" onclick="setTeacherView('cards')">🖼️ 圖卡</button>
+        <select class="select hidden" id="fFocus" onchange="renderStudents()"></select>
+      </div>
+
+      <div class="mt-2" id="teacherBody"></div>
+    </div>
+  </section>
+
+</div>
+</main>
+
+<footer class="site-footer">
+  <div>車城國小資訊老師徐吉德整理製作@2026｜Google Gemini × Claude 協作設計</div>
+  <div class="mt-1" id="footerVersion"></div>
+</footer>
+
+<!-- 版本紀錄 -->
+<div class="modal-backdrop hidden" id="changelogModal" onclick="if(event.target===this)closeModal('changelogModal')">
+  <div class="modal">
+    <div class="modal-head"><div class="card-title">📜 版本更新紀錄</div><div class="spacer"></div><button class="modal-close" onclick="closeModal('changelogModal')">✕</button></div>
+    <div id="changelogBody"></div>
+  </div>
+</div>
+
+<!-- 學員詳情 -->
+<div class="modal-backdrop hidden" id="detailModal" onclick="if(event.target===this)closeModal('detailModal')">
+  <div class="modal">
+    <div class="modal-head"><div class="card-title" id="detailTitle">學員詳情</div><div class="spacer"></div><button class="modal-close" onclick="closeModal('detailModal')">✕</button></div>
+    <div id="detailBody"></div>
+  </div>
+</div>
+
+<div class="toast hidden" id="toast"></div>
+
+<script>
+/* =====================================================================
+   設定區（部署後只需要改這裡）
+   ===================================================================== */
+const DEFAULT_GAS_URL = 'https://script.google.com/macros/s/AKfycbyAdWa6QkWC8Zl2c5p0oFnjVwQrL6o8JnTWq_EfKmGaheXhgEQhWWetvmQTbjzog308/exec';
+const DEFAULT_PRINT_URL = 'https://script.google.com/a/macros/cces.ptc.edu.tw/s/AKfycbyCiOrB0C5ejdXJmNDrlO5NYBVUp6peT3kvJBaZwUjPTVUsE5jZPx4Cpw0qOGJ7K1vUZA/exec';
+
+const APP_VERSION = 'v1.1';
+const CHANGELOG = [
+  { version: 'v1.1', date: '2026-10-09', desc: '教師密碼與 YouTube 影片網址改為直接在試算表「Config」工作表修改（teacherPassword／youtubeUrl），改完立即生效；主控台網址設定區加上提示。' },
+  { version: 'v1.0', date: '2026-10-09', desc: '初版：三關闖關（數位防護罩／中文詠唱術／實體傳送門）、ptc 帳號登入與進度紀錄、影片與列印網址由教師後台設定、提示詞自動帶入帳號或姓名、教師主控台三檢視（表格／清單／圖卡）與學員詳情。' }
+];
+
+const TOTAL_STEPS = 3;
+const XP_TABLE = { 1: 0, 2: 50, 3: 100, 4: 200 };
+const ACCOUNT_PATTERN = /^ptc[a-z0-9]+$/;
+const CONN_ERROR = '⚠️ 系統暫時無法連線，請確認網路後重新整理頁面。';
+
+const STAGES = [
+  { step: 1, ico: '🛡️', name: '數位防護罩' },
+  { step: 2, ico: '🪄', name: '中文詠唱術' },
+  { step: 3, ico: '🌀', name: '實體傳送門' },
+  { step: 4, ico: '🏆', name: '通關' }
+];
+
+const QUIZZES = {
+  1: {
+    q: '觀看 YouTube 影片後，關於「P 圖（影像合成）」的行為，我們應該抱持什麼樣的態度？',
+    opts: [
+      ['A', '隨便拿同學的照片做成搞笑圖嘲笑他'],
+      ['B', '尊重他人，絕對不未經同意亂 P 圖惡作劇'],
+      ['C', '把別人的臉合成在奇怪的動物上傳到網路上'],
+      ['D', '這是我的技術，我想怎麼 P 就怎麼 P']
+    ],
+    answer: 'B',
+    explain: '答對了！我們必須成為負責任的數位小公民，尊重他人的肖像權與感受喔！'
+  },
+  2: {
+    q: '為了讓我們設計的外星人可以完美做成實體鑰匙圈，在下指令給 AI 時，哪一件事情最重要？',
+    opts: [
+      ['A', '圖片越長越好'],
+      ['B', '要求 AI 生成一個「完美的圓形」與邊框'],
+      ['C', '讓外星人變成正方形'],
+      ['D', '背景越黑越好']
+    ],
+    answer: 'B',
+    explain: '答對了！有完整的圓形跟邊框，並確保圖案沒有被裁切，列印出來後才方便製作成圓形的鑰匙圈喔！'
+  },
+  3: {
+    q: '完成超酷的外星人圓形圖片後，我們最後一個步驟是要去哪裡完成任務？',
+    opts: [
+      ['A', '存在隨身碟裡帶回家'],
+      ['B', '上傳到自己的 Facebook'],
+      ['C', '直接關掉電腦'],
+      ['D', '輸入帳號後，將圖片上傳到老師指定的專屬 Google Script 列印網站']
+    ],
+    answer: 'D',
+    explain: '答對了！一定要記得登入帳號並上傳到指定的網站，作品才能傳送到老師那邊變成實體鑰匙圈喔！'
+  }
+};
+
+const CHECKLIST = [
+  { id: 'c1', text: '整張圖是一個「完美的圓形」，外面有像徽章的圓形邊框' },
+  { id: 'c2', text: '外星人的臉是我自己的照片（不是同學的）' },
+  { id: 'c3', text: '下方彩色橫幅有寫上我的帳號或姓名' },
+  { id: 'c4', text: '所有圖案與文字都在圓形裡面，沒有被裁切到' }
+];
+
+/* =====================================================================
+   狀態
+   ===================================================================== */
+let config = { youtubeUrl: '', printUrl: DEFAULT_PRINT_URL };
+let currentStudent = null;
+let maxStepReached = 1;
+let viewingStep = 1;
+let nameMode = 'account';
+let quizState = {};
+let saving = false;
+
+let teacherPwd = '';
+let allStudents = [];
+let teacherViewMode = 'table';
+
+/* =====================================================================
+   通訊（智慧路由）
+   ===================================================================== */
+function callGAS_JSONP(params, callback) {
+  const cbName = 'cb_' + Date.now() + '_' + Math.floor(Math.random() * 1e6);
+  const script = document.createElement('script');
+  let done = false;
+  const timer = setTimeout(() => finish(new Error('連線逾時')), 20000);
+  function finish(err, data) {
+    if (done) return;
+    done = true;
+    clearTimeout(timer);
+    delete window[cbName];
+    if (script.parentNode) script.parentNode.removeChild(script);
+    callback(err, data);
+  }
+  window[cbName] = data => finish(null, data);
+  const qs = Object.entries({ ...params, callback: cbName })
+    .map(([k, v]) => `${k}=${encodeURIComponent(v)}`).join('&');
+  script.onerror = () => finish(new Error('JSONP 連線失敗'));
+  script.src = DEFAULT_GAS_URL + '?' + qs;
+  document.head.appendChild(script);
+}
+
+async function callGAS_POST(data) {
+  try {
+    const res = await fetch(DEFAULT_GAS_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain' }, // ⚠️ 不能用 application/json
+      body: JSON.stringify(data),
+      redirect: 'follow'
+    });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    return await res.json();
+  } catch (err) {
+    throw new Error('POST 連線失敗');
+  }
+}
+
+/* =====================================================================
+   共用 UI
+   ===================================================================== */
+function $(id) { return document.getElementById(id); }
+
+function escapeHtml(v) {
+  return (v === null || v === undefined ? '' : String(v))
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+
+function safeUrl(u) {
+  const s = (u || '').toString().trim();
+  return /^https?:\/\//i.test(s) ? s : '';
+}
+
+let toastTimer = null;
+function showToast(msg, type) {
+  const t = $('toast');
+  t.textContent = msg;
+  t.className = 'toast' + (type ? ' ' + type : '');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.add('hidden'), 2800);
+}
+
+function showConnectionError(extra) {
+  const b = $('errorBanner');
+  b.textContent = CONN_ERROR + (extra ? '（' + extra + '）' : '');
+  b.classList.remove('hidden');
+}
+function hideConnectionError() { $('errorBanner').classList.add('hidden'); }
+
+function openModal(id) { $(id).classList.remove('hidden'); }
+function closeModal(id) { $(id).classList.add('hidden'); }
+
+function setBusy(btn, busy, busyText) {
+  if (!btn) return;
+  if (busy) {
+    btn.dataset.label = btn.innerHTML;
+    btn.innerHTML = '<span class="spinner"></span> ' + (busyText || '處理中…');
+    btn.disabled = true;
+  } else {
+    if (btn.dataset.label) btn.innerHTML = btn.dataset.label;
+    btn.disabled = false;
+  }
+}
+
+function showView(name) {
+  ['login', 'quest', 'teacher'].forEach(v => $('view-' + v).classList.toggle('hidden', v !== name));
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function storageGet(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+function storageSet(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+function storageDel(k) { try { localStorage.removeItem(k); } catch (e) {} }
+
+/* =====================================================================
+   版本標示
+   ===================================================================== */
+function renderVersion() {
+  $('versionBadge').textContent = APP_VERSION;
+  $('footerVersion').textContent = '目前版本 ' + APP_VERSION + '（點標題旁的版本徽章查看更新紀錄）';
+  const env = $('envBanner');
+  const host = location.hostname;
+  if (/github\.io$/.test(host)) {
+    env.textContent = '✅ 目前運行於 GitHub Pages 正式環境（' + APP_VERSION + '）';
+  } else {
+    env.textContent = '🧪 目前為本機／測試環境（' + APP_VERSION + '）';
+    env.classList.add('warn');
+  }
+  $('changelogBody').innerHTML = CHANGELOG.map((c, i) => `
+    <div class="log-item">
+      <div class="row"><b>${escapeHtml(c.version)}</b><span class="muted small">${escapeHtml(c.date)}</span>${i === 0 ? '<span class="tag tag-new">最新</span>' : ''}</div>
+      <div class="small mt-1">${escapeHtml(c.desc)}</div>
+    </div>`).join('');
+}
+
+/* =====================================================================
+   設定讀取
+   ===================================================================== */
+function loadConfig() {
+  callGAS_JSONP({ action: 'getConfig' }, (err, res) => {
+    if (err || !res || !res.success) { showConnectionError(); return; }
+    hideConnectionError();
+    config.youtubeUrl = res.data.youtubeUrl || '';
+    config.printUrl = safeUrl(res.data.printUrl) || DEFAULT_PRINT_URL;
+    if (currentStudent) { renderVideo(); renderPrintLink(); }
+  });
+}
+
+/* =====================================================================
+   學生：登入 / 登出
+   ===================================================================== */
+function doLogin() {
+  const account = $('inAccount').value.trim().toLowerCase();
+  const name = $('inName').value.trim();
+  const className = $('inClass').value.trim();
+  if (!account) { showToast('請輸入帳號', 'error'); return; }
+  if (!ACCOUNT_PATTERN.test(account)) { showToast('帳號必須以 ptc 開頭，只能有英文與數字', 'error'); return; }
+  if (!name) { showToast('請輸入姓名', 'error'); return; }
+
+  const btn = $('btnLogin');
+  setBusy(btn, true, '登入中…');
+  callGAS_JSONP({ action: 'login', account, name, className }, (err, res) => {
+    setBusy(btn, false);
+    if (err) { showConnectionError(); return; }
+    if (!res.success) { showToast(res.message || '登入失敗', 'error'); return; }
+    hideConnectionError();
+    storageSet('keychain_account', account);
+    storageSet('keychain_name', name);
+    storageSet('keychain_class', className);
+    currentStudent = res.data;
+    restoreFromStudent(currentStudent);
+    showView('quest');
+    showToast(res.isNew ? '🚀 歡迎新太空人！' : '👋 歡迎回來，接著上次的進度！', 'success');
+    goToStep(Math.min(maxStepReached, 4));
+  });
+}
+
+function logout() {
+  currentStudent = null;
+  showView('login');
+}
+
+function goStudentHome() {
+  if (currentStudent) { showView('quest'); goToStep(viewingStep); }
+  else showView('login');
+}
+
+function parseQuiz(v) {
+  const s = (v || '').toString();
+  if (!s) return { passed: false, answer: '', wrong: 0 };
+  const [a, w] = s.split('|');
+  return { passed: true, answer: a, wrong: Number(w) || 0 };
+}
+
+function restoreFromStudent(s) {
+  maxStepReached = Math.min(Math.max(Number(s.step) || 1, 1), 4);
+  $('sbName').textContent = s.name + (s.className ? '（' + s.className + '）' : '');
+  $('sbAccount').textContent = s.account;
+  $('sbXp').textContent = s.xp || 0;
+  $('inReflection').value = s.reflection || '';
+  $('inAlienDesc').value = s.alienDesc || '';
+  $('cbWatched').checked = maxStepReached > 1;
+  $('cbUploaded').checked = !!s.uploadConfirmed;
+  syncCheckStyle('cbWatched');
+  syncCheckStyle('cbUploaded');
+  quizState = { 1: parseQuiz(s.q1), 2: parseQuiz(s.q2), 3: parseQuiz(s.q3) };
+  const checked = (s.checklist || '').split(',').filter(Boolean);
+  renderChecklist(checked);
+  [1, 2, 3].forEach(renderQuiz);
+}
+
+/* =====================================================================
+   學生：關卡切換
+   ===================================================================== */
+function renderStageMap() {
+  $('stageMap').innerHTML = STAGES.map(s => {
+    let cls = 'pill';
+    if (s.step === viewingStep) cls += ' active';
+    else if (s.step < maxStepReached || (s.step === 4 && maxStepReached === 4)) cls += ' done';
+    else if (s.step > maxStepReached) cls += ' locked';
+    const mark = (s.step < maxStepReached && s.step !== viewingStep) ? '✅ ' : '';
+    return `<button class="${cls}" onclick="goToStep(${s.step})"><span class="p-ico">${s.ico}</span>${mark}${s.name}</button>`;
+  }).join('');
+}
+
+function goToStep(n) {
+  if (n > maxStepReached) { showToast('🔒 要先完成前面的關卡喔！', 'error'); return; }
+  viewingStep = n;
+  document.querySelectorAll('.quest-stage').forEach(el => el.classList.add('hidden'));
+  $('stage-' + n).classList.remove('hidden');
+  renderStageMap();
+  if (n === 1) renderVideo();
+  if (n === 2) renderPrompt();
+  if (n === 3) renderPrintLink();
+  if (n === 4) $('doneAlien').textContent = $('inAlienDesc').value || '（未填寫）';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+/* ---------- 第一關：影片 ---------- */
+function parseYouTubeId(url) {
+  const s = (url || '').trim();
+  const m = s.match(/(?:youtu\.be\/|v=|\/embed\/|\/shorts\/|\/live\/)([A-Za-z0-9_-]{11})/);
+  return m ? m[1] : '';
+}
+
+function renderVideo() {
+  const id = parseYouTubeId(config.youtubeUrl);
+  const box = $('videoBox');
+  if (!id) {
+    box.innerHTML = '<div class="video-empty">📺 老師還沒有設定影片，請依照老師的指示觀看「P 圖不惡作劇」影片。</div>';
+    return;
+  }
+  if (box.dataset.vid === id) return;
+  box.dataset.vid = id;
+  box.innerHTML = `<div class="video-wrap"><iframe src="https://www.youtube.com/embed/${id}?rel=0" title="資訊倫理影片" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>
+    <div class="hint mt-1">影片無法播放？<a href="https://www.youtube.com/watch?v=${id}" target="_blank" rel="noopener">點這裡到 YouTube 觀看</a></div>`;
+}
+
+/* ---------- 勾選框 ---------- */
+function toggleCheck(ev, id) {
+  if (ev.target.tagName === 'INPUT') return;
+  const cb = $(id);
+  cb.checked = !cb.checked;
+  syncCheckStyle(id);
+}
+function syncCheckStyle(id) {
+  const cb = $(id);
+  const wrap = cb.closest('.check-item');
+  if (wrap) wrap.classList.toggle('checked', cb.checked);
+}
+
+/* ---------- 第二關：提示詞 ---------- */
+function setNameMode(mode) {
+  nameMode = mode;
+  $('segAccount').classList.toggle('on', mode === 'account');
+  $('segName').classList.toggle('on', mode === 'name');
+  renderPrompt();
+}
+
+function bannerText() {
+  if (!currentStudent) return '[輸入你的帳號或姓名]';
+  return nameMode === 'name' ? currentStudent.name : currentStudent.account;
+}
+
+function buildPrompt(label) {
+  return '請使用我上傳的人臉照片，將這個人變成一個可愛、友善的 3D 卡通綠色外星人。這個人的真實臉孔要自然且完美地成為外星人的臉，並穿著專屬的宇宙太空衣與頭盔。\n'
+    + '整張圖片必須是一個「完美的圓形」，置於純白色的背景正中央。請在圓形的邊緣加上像徽章一樣的圓形外框。外星人要開心地揮手，背景是充滿橘色星球、閃亮星星與美麗星雲的宇宙。\n'
+    + '在圓形內部的最下方，加上一個 3D 彩色弧形橫幅（Banner），裡面用繁體中文粗體字寫上：「' + label + '@Gemini AI」。整張插圖必須是 3D 動畫 Q 版風格，而且所有的圖案與文字都要「完整包覆在圓形外框內」，絕對不能超出圓形邊界或被裁切到。';
+}
+
+function renderPrompt() {
+  const label = bannerText();
+  const text = buildPrompt('\u0000');
+  const [before, after] = text.split('\u0000');
+  $('promptBox').innerHTML = escapeHtml(before) + '<span class="hl">' + escapeHtml(label) + '</span>' + escapeHtml(after);
+}
+
+function copyPrompt() {
+  const text = buildPrompt(bannerText());
+  const ok = () => showToast('📋 已複製！到 Gemini 貼上吧', 'success');
+  if (navigator.clipboard && window.isSecureContext) {
+    navigator.clipboard.writeText(text).then(ok).catch(() => fallbackCopy(text, ok));
+  } else {
+    fallbackCopy(text, ok);
+  }
+}
+function fallbackCopy(text, ok) {
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.position = 'fixed';
+  ta.style.opacity = '0';
+  document.body.appendChild(ta);
+  ta.select();
+  try { document.execCommand('copy'); ok(); } catch (e) { showToast('複製失敗，請手動選取文字複製', 'error'); }
+  document.body.removeChild(ta);
+}
+
+function renderChecklist(checkedIds) {
+  $('checklistBox').innerHTML = CHECKLIST.map(c => `
+    <div class="check-item${checkedIds.includes(c.id) ? ' checked' : ''}" onclick="toggleCheck(event,'cb_${c.id}')">
+      <input type="checkbox" id="cb_${c.id}" data-ck="${c.id}" ${checkedIds.includes(c.id) ? 'checked' : ''} onchange="syncCheckStyle('cb_${c.id}')">
+      <div>${escapeHtml(c.text)}</div>
+    </div>`).join('');
+}
+function getCheckedIds() {
+  return Array.from(document.querySelectorAll('[data-ck]')).filter(cb => cb.checked).map(cb => cb.dataset.ck);
+}
+
+/* ---------- 第三關：列印網站 ---------- */
+function renderPrintLink() {
+  $('printLink').href = safeUrl(config.printUrl) || DEFAULT_PRINT_URL;
+}
+
+/* ---------- 測驗 ---------- */
+function renderQuiz(n) {
+  const qz = QUIZZES[n];
+  const st = quizState[n] || { passed: false, answer: '', wrong: 0 };
+  const opts = qz.opts.map(([letter, text]) => {
+    let cls = 'quiz-opt';
+    if (st.passed && letter === qz.answer) cls += ' correct';
+    return `<button class="${cls}" data-letter="${letter}" ${st.passed ? 'disabled' : ''} onclick="answerQuiz(${n},'${letter}',this)">(${letter}) ${escapeHtml(text)}</button>`;
+  }).join('');
+  $('quiz-' + n).innerHTML = `
+    <div class="quiz">
+      <div class="quiz-q">❓ ${escapeHtml(qz.q)}</div>
+      <div class="quiz-opts">${opts}</div>
+      <div id="quiz-${n}-fb">${st.passed ? `<div class="explain ok">🎉 ${escapeHtml(qz.explain)}</div>` : ''}</div>
+    </div>`;
+}
+
+function answerQuiz(n, letter, btn) {
+  const qz = QUIZZES[n];
+  const st = quizState[n] || (quizState[n] = { passed: false, answer: '', wrong: 0 });
+  if (st.passed) return;
+  const fb = $('quiz-' + n + '-fb');
+  if (letter === qz.answer) {
+    st.passed = true;
+    st.answer = letter;
+    renderQuiz(n);
+    showToast('🎉 答對了！', 'success');
+  } else {
+    st.wrong += 1;
+    btn.classList.add('wrong');
+    btn.disabled = true;
+    btn.classList.remove('shake');
+    void btn.offsetWidth;
+    btn.classList.add('shake');
+    fb.innerHTML = '<div class="explain no">🤔 再想想看！洋蔥寶寶相信你一定可以找到正確答案。</div>';
+  }
+}
+
+function quizValue(n) {
+  const st = quizState[n];
+  return st && st.passed ? st.answer + '|' + st.wrong : '';
+}
+
+/* =====================================================================
+   學生：過關與儲存
+   ===================================================================== */
+function collectCurrentFields() {
+  return {
+    reflection: $('inReflection').value.trim(),
+    alienDesc: $('inAlienDesc').value.trim(),
+    checklist: getCheckedIds().join(','),
+    uploadConfirmed: $('cbUploaded').checked,
+    q1: quizValue(1),
+    q2: quizValue(2),
+    q3: quizValue(3)
+  };
+}
+
+function validateStage(n) {
+  if (n === 1) {
+    if (!$('cbWatched').checked) return '請先看完影片並打勾確認';
+    if ($('inReflection').value.trim().length < 10) return '想一想的心得至少要寫 10 個字喔';
+    if (!quizState[1] || !quizState[1].passed) return '請先答對影片小測驗';
+  }
+  if (n === 2) {
+    if (getCheckedIds().length < CHECKLIST.length) return '魔法圓檢查表要全部打勾才能過關';
+    if ($('inAlienDesc').value.trim().length < 5) return '請用至少 5 個字介紹你的外星人';
+    if (!quizState[2] || !quizState[2].passed) return '請先答對小測驗';
+  }
+  if (n === 3) {
+    if (!$('cbUploaded').checked) return '請確認已在列印網站上傳成功';
+    if (!quizState[3] || !quizState[3].passed) return '請先答對小測驗';
+  }
+  return '';
+}
+
+function completeStage(n) {
+  const msg = validateStage(n);
+  if (msg) { showToast(msg, 'error'); return; }
+  saveStepAndGo(n + 1, $('btnStage' + n));
+}
+
+async function saveStepAndGo(nextStep, btn) {
+  if (saving || !currentStudent) return;
+  saving = true;
+  const prevMax = maxStepReached;
+  const prevXp = currentStudent.xp || 0;
+  if (nextStep > maxStepReached) maxStepReached = nextStep;
+  const xp = Math.max(prevXp, XP_TABLE[maxStepReached] || 0);
+  const payload = {
+    action: 'saveProgress',
+    account: currentStudent.account,
+    step: maxStepReached,
+    xp: xp,
+    isCompleted: maxStepReached > TOTAL_STEPS,
+    ...collectCurrentFields()
+  };
+  setBusy(btn, true, '傳送中…');
+  try {
+    const res = await callGAS_POST(payload);
+    if (!res.success) throw new Error(res.message || '儲存失敗');
+    hideConnectionError();
+    currentStudent = res.data;
+    $('sbXp').textContent = currentStudent.xp || 0;
+    maxStepReached = Math.max(maxStepReached, Number(currentStudent.step) || 1);
+    const gained = (currentStudent.xp || 0) - prevXp;
+    if (gained > 0) showToast('⭐ 獲得 ' + gained + ' XP！', 'success');
+    goToStep(nextStep);
+  } catch (err) {
+    maxStepReached = prevMax;
+    if (/連線/.test(err.message)) showConnectionError();
+    else showToast(err.message, 'error');
+  } finally {
+    setBusy(btn, false);
+    saving = false;
+  }
+}
+
+/* =====================================================================
+   教師主控台
+   ===================================================================== */
+function fmtQuiz(v) {
+  const q = parseQuiz(v);
+  if (!q.passed) return '—';
+  return '✅ ' + q.answer + (q.wrong > 0 ? '（錯 ' + q.wrong + ' 次）' : '（一次答對）');
+}
+function fmtChecklist(v) {
+  const n = (v || '').split(',').filter(Boolean).length;
+  return n ? n + ' / ' + CHECKLIST.length + ' 項' : '—';
+}
+function fmtUpload(v) { return v ? '✅ 已上傳' : '—'; }
+
+// 欄位統一定義：日後加欄位只改這裡，三種檢視一起生效
+const ANSWER_FIELDS = [
+  { key: 'reflection', label: '資訊倫理心得', icon: '💭', mono: false },
+  { key: 'alienDesc', label: '我的外星人特色', icon: '👽', mono: false },
+  { key: 'q1', label: '測驗1｜P 圖態度', icon: '🛡️', fmt: fmtQuiz },
+  { key: 'q2', label: '測驗2｜圓形重點', icon: '⭕', fmt: fmtQuiz },
+  { key: 'q3', label: '測驗3｜上傳去處', icon: '🌀', fmt: fmtQuiz },
+  { key: 'checklist', label: '魔法圓檢查表', icon: '☑️', fmt: fmtChecklist },
+  { key: 'uploadConfirmed', label: '列印網站上傳', icon: '📤', fmt: fmtUpload }
+];
+const TEXT_FIELDS = ANSWER_FIELDS.filter(f => !f.fmt);
+
+function fieldText(s, f) {
+  const v = s[f.key];
+  if (f.fmt) return f.fmt(v);
+  return (v === null || v === undefined || v === '') ? '—' : String(v);
+}
+
+function openTeacher() {
+  showView('teacher');
+  let saved = '';
+  try { saved = sessionStorage.getItem('keychain_tpwd') || ''; } catch (e) {}
+  if (!teacherPwd && saved) teacherPwd = saved;
+  if (teacherPwd) {
+    $('teacherGate').classList.add('hidden');
+    $('teacherConsole').classList.remove('hidden');
+    fillSettings();
+    loadStudents();
+  } else {
+    $('teacherGate').classList.remove('hidden');
+    $('teacherConsole').classList.add('hidden');
+    setTimeout(() => $('inTeacherPwd').focus(), 50);
+  }
+}
+
+function teacherLogin() {
+  const pwd = $('inTeacherPwd').value;
+  if (!pwd) { showToast('請輸入密碼', 'error'); return; }
+  const btn = $('btnTeacherLogin');
+  setBusy(btn, true, '驗證中…');
+  callGAS_JSONP({ action: 'verifyTeacher', password: pwd }, (err, res) => {
+    setBusy(btn, false);
+    if (err) { showConnectionError(); return; }
+    if (!res.success) { showToast('密碼錯誤', 'error'); return; }
+    teacherPwd = pwd;
+    try { sessionStorage.setItem('keychain_tpwd', pwd); } catch (e) {}
+    $('inTeacherPwd').value = '';
+    openTeacher();
+  });
+}
+
+function teacherLogout() {
+  teacherPwd = '';
+  allStudents = [];
+  try { sessionStorage.removeItem('keychain_tpwd'); } catch (e) {}
+  openTeacher();
+}
+
+function toggleSettings() {
+  fillSettings();
+  $('settingsBox').classList.toggle('hidden');
+}
+function fillSettings() {
+  $('inYoutube').value = config.youtubeUrl || '';
+  $('inPrintUrl').value = config.printUrl || DEFAULT_PRINT_URL;
+}
+
+async function saveSettings() {
+  const youtubeUrl = $('inYoutube').value.trim();
+  const printUrl = $('inPrintUrl').value.trim();
+  if (!printUrl) { showToast('請先輸入列印網站網址', 'error'); return; }
+  if (!safeUrl(printUrl)) { showToast('列印網站網址要以 https:// 開頭', 'error'); return; }
+  if (youtubeUrl && !parseYouTubeId(youtubeUrl)) { showToast('看不懂這個 YouTube 網址，請確認', 'error'); return; }
+  const btn = $('btnSaveSettings');
+  setBusy(btn, true, '儲存中…');
+  try {
+    const res = await callGAS_POST({ action: 'saveConfig', password: teacherPwd, youtubeUrl, printUrl });
+    if (!res.success) throw new Error(res.message || '儲存失敗');
+    config.youtubeUrl = res.data.youtubeUrl;
+    config.printUrl = res.data.printUrl;
+    showToast('💾 設定已儲存，學生重新整理後生效', 'success');
+  } catch (err) {
+    if (/連線/.test(err.message)) showConnectionError(); else showToast(err.message, 'error');
+  } finally {
+    setBusy(btn, false);
+  }
+}
+
+function loadStudents() {
+  const btn = $('btnRefresh');
+  setBusy(btn, true, '載入中…');
+  callGAS_JSONP({ action: 'getStudents', password: teacherPwd }, (err, res) => {
+    setBusy(btn, false);
+    if (err) { showConnectionError(); return; }
+    if (!res.success) {
+      showToast(res.message || '讀取失敗', 'error');
+      if (res.message === '密碼錯誤') teacherLogout();
+      return;
+    }
+    hideConnectionError();
+    allStudents = res.data || [];
+    buildFilters();
+    renderStudents();
+  });
+}
+
+function dateOf(s) { return String(s.updatedAt || s.createdAt || '').slice(0, 10); }
+
+function buildFilters() {
+  const fDate = $('fDate');
+  const keepDate = fDate.value;
+  const dates = Array.from(new Set(allStudents.map(dateOf).filter(Boolean))).sort().reverse();
+  fDate.innerHTML = '<option value="">📅 全部日期</option>' + dates.map(d => `<option value="${escapeHtml(d)}">📅 ${escapeHtml(d)}</option>`).join('');
+  if (keepDate && dates.includes(keepDate)) fDate.value = keepDate;
+
+  const fClass = $('fClass');
+  const keepClass = fClass.value;
+  const classes = Array.from(new Set(allStudents.map(s => s.className).filter(Boolean))).sort();
+  fClass.innerHTML = '<option value="">🏫 全部班級</option>' + classes.map(c => `<option value="${escapeHtml(c)}">🏫 ${escapeHtml(c)}</option>`).join('');
+  if (keepClass && classes.includes(keepClass)) fClass.value = keepClass;
+
+  const fFocus = $('fFocus');
+  const keepFocus = fFocus.value;
+  fFocus.innerHTML = '<option value="">🔍 全部欄位</option>' + ANSWER_FIELDS.map(f => `<option value="${f.key}">${f.icon} ${escapeHtml(f.label)}</option>`).join('');
+  if (keepFocus) fFocus.value = keepFocus;
+}
+
+function getFiltered() {
+  const d = $('fDate').value;
+  const c = $('fClass').value;
+  return allStudents
+    .filter(s => (!d || dateOf(s) === d) && (!c || s.className === c))
+    .sort((a, b) => (b.xp || 0) - (a.xp || 0) || String(b.updatedAt).localeCompare(String(a.updatedAt)));
+}
+
+function setTeacherView(mode) {
+  teacherViewMode = mode;
+  renderStudents();
+}
+
+function stepLabel(s) {
+  if (s.isCompleted || s.step > TOTAL_STEPS) return '🏆 已完賽';
+  const passed = Math.min(Math.max((s.step || 1) - 1, 0), TOTAL_STEPS);
+  return '第 ' + Math.min(s.step || 1, TOTAL_STEPS) + ' 關（已過 ' + passed + '/' + TOTAL_STEPS + '）';
+}
+function progressPct(s) {
+  const passed = Math.min(Math.max((s.step || 1) - 1, 0), TOTAL_STEPS);
+  return Math.round(passed / TOTAL_STEPS * 100);
+}
+
+function renderStats(list) {
+  const done = list.filter(s => s.isCompleted).length;
+  const avg = list.length ? Math.round(list.reduce((t, s) => t + (s.xp || 0), 0) / list.length) : 0;
+  const stats = [
+    { box: 'stat st-purple', num: list.length, lbl: '👥 學員人數' },
+    { box: 'stat st-green', num: done, lbl: '🏆 已完賽' },
+    { box: 'stat st-orange', num: list.length - done, lbl: '🚀 進行中' },
+    { box: 'stat st-amber', num: avg, lbl: '⭐ 平均 XP' }
+  ];
+  $('statsBox').innerHTML = stats.map(s => `<div class="${s.box}"><div class="s-num">${s.num}</div><div class="s-lbl">${s.lbl}</div></div>`).join('');
+}
+
+function renderStudents() {
+  ['table', 'list', 'cards'].forEach(m => {
+    const id = { table: 'vTable', list: 'vList', cards: 'vCards' }[m];
+    $(id).classList.toggle('active', teacherViewMode === m);
+  });
+  $('fFocus').classList.toggle('hidden', teacherViewMode !== 'cards');
+
+  const list = getFiltered();
+  renderStats(list);
+  const body = $('teacherBody');
+  if (!list.length) {
+    body.innerHTML = '<div class="empty-box">🛸 目前還沒有學員資料（或篩選條件下沒有資料）。</div>';
+    return;
+  }
+  if (teacherViewMode === 'table') body.innerHTML = renderTable(list);
+  else if (teacherViewMode === 'list') body.innerHTML = renderList(list);
+  else body.innerHTML = renderCards(list);
+}
+
+function renderTable(list) {
+  const rows = list.map(s => `
+    <tr>
+      <td class="nowrap mono">${escapeHtml(s.account)}</td>
+      <td class="nowrap bold">${escapeHtml(s.name)}</td>
+      <td class="nowrap">${escapeHtml(s.className || '—')}</td>
+      <td class="nowrap">${s.isCompleted ? '<span class="tag tag-green">🏆 已完賽</span>' : '<span class="tag tag-amber">' + escapeHtml(stepLabel(s)) + '</span>'}</td>
+      <td class="nowrap bold">${s.xp || 0}</td>
+      <td class="nowrap">${escapeHtml(fmtQuiz(s.q1))}<br>${escapeHtml(fmtQuiz(s.q2))}<br>${escapeHtml(fmtQuiz(s.q3))}</td>
+      <td class="nowrap">${escapeHtml(fmtChecklist(s.checklist))}</td>
+      <td class="nowrap">${escapeHtml(fmtUpload(s.uploadConfirmed))}</td>
+      <td class="nowrap small muted">${escapeHtml(s.updatedAt || '')}</td>
+      <td><button class="btn btn-ghost btn-sm" onclick="openDetail('${escapeHtml(s.account)}')">詳情</button></td>
+    </tr>`).join('');
+  return `<div class="table-wrap"><table class="data">
+    <thead><tr><th>帳號</th><th>姓名</th><th>班級</th><th>進度</th><th>XP</th><th>測驗 1/2/3</th><th>圓形檢核</th><th>上傳</th><th>更新時間</th><th></th></tr></thead>
+    <tbody>${rows}</tbody></table></div>`;
+}
+
+function renderList(list) {
+  return list.map(s => `
+    <div class="list-item">
+      <div class="row">
+        <span class="bold big-text">${escapeHtml(s.name)}</span>
+        <span class="small muted mono">${escapeHtml(s.account)}</span>
+        ${s.className ? '<span class="tag tag-slate">' + escapeHtml(s.className) + '</span>' : ''}
+        <div class="spacer"></div>
+        <span class="xp-chip">⭐ ${s.xp || 0}</span>
+        <button class="btn btn-ghost btn-sm" onclick="openDetail('${escapeHtml(s.account)}')">詳情</button>
+      </div>
+      <div class="row mt-1">
+        <div class="progress"><div class="progress-bar" style="width:${progressPct(s)}%"></div></div>
+        <span class="small bold">${escapeHtml(stepLabel(s))}</span>
+      </div>
+      <div class="summary-grid">
+        ${ANSWER_FIELDS.map(f => `<div class="detail-block"><div class="detail-label">${f.icon} ${escapeHtml(f.label)}</div><div class="clamp-2 ${f.mono ? 'mono' : ''}">${escapeHtml(fieldText(s, f))}</div></div>`).join('')}
+      </div>
+    </div>`).join('');
+}
+
+function renderCards(list) {
+  const focus = $('fFocus').value;
+  const fields = focus ? ANSWER_FIELDS.filter(f => f.key === focus) : TEXT_FIELDS;
+  return '<div class="card-grid">' + list.map(s => `
+    <div class="s-card" onclick="openDetail('${escapeHtml(s.account)}')">
+      <div class="row">
+        <span class="s-card-name">👽 ${escapeHtml(s.name)}</span>
+        <div class="spacer"></div>
+        ${s.isCompleted ? '<span class="tag tag-green">🏆</span>' : '<span class="tag tag-amber">' + Math.min(s.step || 1, TOTAL_STEPS) + '/' + TOTAL_STEPS + '</span>'}
+      </div>
+      <div class="small muted">${escapeHtml(s.className || '')} ${escapeHtml(s.account)}</div>
+      ${fields.map(f => `<div><div class="detail-label">${f.icon} ${escapeHtml(f.label)}</div><div class="${focus ? 'big-text detail-val' : 'clamp-4'} ${f.mono ? 'mono' : ''}">${escapeHtml(fieldText(s, f))}</div></div>`).join('')}
+    </div>`).join('') + '</div>';
+}
+
+function openDetail(account) {
+  const s = allStudents.find(x => x.account === account);
+  if (!s) return;
+  $('detailTitle').textContent = '👽 ' + s.name + '（' + s.account + '）';
+  $('detailBody').innerHTML = `
+    <div class="row"><span class="tag tag-slate">${escapeHtml(s.className || '未填班級')}</span><span class="tag ${s.isCompleted ? 'tag-green' : 'tag-amber'}">${escapeHtml(stepLabel(s))}</span><span class="xp-chip">⭐ ${s.xp || 0} XP</span></div>
+    ${ANSWER_FIELDS.map(f => `<div class="detail-block"><div class="detail-label">${f.icon} ${escapeHtml(f.label)}</div><div class="detail-val ${f.mono ? 'mono' : ''}">${escapeHtml(fieldText(s, f))}</div></div>`).join('')}
+    <div class="small muted mt-2">建立：${escapeHtml(s.createdAt || '')}｜更新：${escapeHtml(s.updatedAt || '')}</div>`;
+  openModal('detailModal');
+}
+
+/* =====================================================================
+   啟動
+   ===================================================================== */
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') { closeModal('changelogModal'); closeModal('detailModal'); }
+  if (e.key === 'Enter' && !$('view-login').classList.contains('hidden') && e.target.classList.contains('input')) doLogin();
+});
+
+(function init() {
+  renderVersion();
+  $('inAccount').value = storageGet('keychain_account') || '';
+  $('inName').value = storageGet('keychain_name') || '';
+  $('inClass').value = storageGet('keychain_class') || '';
+  renderChecklist([]);
+  loadConfig();
+})();
+</script>
+</body>
+</html>
